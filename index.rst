@@ -9,16 +9,15 @@ This documentation describes the official `Fiesta
 have any suggestions or issues please contact `api@corp.fiesta.cc
 <mailto:api@corp.fiesta.cc>`_.
 
-To see recent changes to the API, check out the :doc:`changelog`.
+To see recent changes to the API, check out the :doc:`changelog </changelog>`.
 
 There are a several main sections of the API:
 
 - The :doc:`list-management-api` allows API clients to create and
   manage Fiesta lists.
 
-- The :doc:`message-manipulation-api` allows API clients to create
-  applications that can modify messages as they are sent to existing
-  Fiesta lists.
+- The :doc:`message-manipulation-api` allows API clients to modify
+  messages as they are sent to existing Fiesta lists.
 
 Contributing
 ------------
@@ -32,6 +31,7 @@ contributing please contact `api@corp.fiesta.cc
    :hidden:
 
    list-management-api
+   authentication
    message-manipulation-api
    changelog
 

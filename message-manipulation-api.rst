@@ -44,13 +44,20 @@ JSON data. An example message follows:
 .. code-block:: js
 
   {
-    group: {
-      link: "/group/TTZsJb0k0y7BAAAL"
-      name: "family"
-    },
+    group: GROUP,
+    group_name: "family",
+    sender: USER,
     subject: "Hi guys",
     content: "This is an example message."
   }
+
+`group` is the group id / URI of the group the message was sent to.
+
+`group_name` is the name used by the sender for the group.
+
+.. note:: Different users might have different names for the same group.
+
+`sender` is the user id / URI of the message's sender.
 
 `subject` is the message's subject.
 

@@ -79,7 +79,7 @@ field - let's use it to try our ``/hello/client`` request again
 
 .. code-block:: console
 
-  $ curl --header "Authorization: Bearer ACCESS_TOKEN" -i https://api.fiesta.cc/hello/client
+  $ curl -H "Authorization: Bearer ACCESS_TOKEN" -i https://api.fiesta.cc/hello/client
   HTTP/1.1 200 OK
   Content-Type: application/json
 
@@ -121,7 +121,7 @@ We can try using a :ref:`Client authentication <client-auth>` token
 
 .. code-block:: console
 
-  $ curl --header "Authorization: Bearer ACCESS_TOKEN" -i https://api.fiesta.cc/hello/user
+  $ curl -H "Authorization: Bearer ACCESS_TOKEN" -i https://api.fiesta.cc/hello/user
   HTTP/1.1 401 UNAUTHORIZED
   WWW-Authenticate: Bearer realm="fiesta", error="invalid_token", error_description="User authentication required"
 
@@ -162,7 +162,7 @@ again (replace *ACCESS_TOKEN* with the value you received above):
 
 .. code-block:: console
 
-  $ curl --header "Authorization: Bearer ACCESS_TOKEN" -i https://api.fiesta.cc/hello/user
+  $ curl -H "Authorization: Bearer ACCESS_TOKEN" -i https://api.fiesta.cc/hello/user
   HTTP/1.1 200 OK
   Content-Type: application/json
 
@@ -175,6 +175,6 @@ return **401 UNAUTHORIZED**, and you'll need to re-authorize:
 
 .. code-block:: console
 
-  $ curl --header "Authorization: Bearer ACCESS_TOKEN" -i https://api.fiesta.cc/hello/user
+  $ curl -H "Authorization: Bearer ACCESS_TOKEN" -i https://api.fiesta.cc/hello/user
   HTTP/1.1 401 UNAUTHORIZED
   WWW-Authenticate: Bearer realm="fiesta", error="invalid_token", error_description="Revoked token"

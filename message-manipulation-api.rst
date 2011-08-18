@@ -8,13 +8,16 @@ A valid set of client credentials is required to use the message
 manipulation API. To get client credentials, contact
 `api@corp.fiesta.cc <mailto:api@corp.fiesta.cc>`_.
 
+.. _message-hook:
+
 Message Hook
 ------------
 
 The main point of interaction for the API is a *message hook*
 specified by the application developer. The message hook is a URI that
-Fiesta will post message data to. To set a message hook for your
-application, email `api@corp.fiesta.cc <mailto:api@corp.fiesta.cc>`_.
+Fiesta will post message data to. To set a message hook, visit `the
+settings page <https://fiesta.cc/settings>`_ and click the "Manage"
+link for your client.
 
 Activation
 ----------
@@ -32,14 +35,20 @@ several ways that an application can be activated:
   a given Fiesta list and a message is sent to that list.
 
 - Per-domain activation occurs when a message is sent to a list using
-  a Fiesta custom-domain, and one of the domain's managers has
-  installed the application on that domain.
+  a Fiesta custom domain, and one of the domain's managers has
+  installed the application on that domain. Follow these steps to
+  install your application on a domain you can manage:
+
+  #. Be sure you have a :ref:`message-hook` set for your application.
+  #. Visit `the settings page <https://fiesta.cc/settings>`_ and click
+     the "Manage" link for your domain.
+  #. Select your application from the drop-down and click "Add app".
 
 Incoming Messages
 -----------------
 
 Incoming messages are posted to your application's message hook as
-JSON data. An example message follows:
+JSON data. Here's an example:
 
 .. code-block:: js
 

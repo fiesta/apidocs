@@ -2,13 +2,16 @@
 
 import sys, os
 
-extensions = ["sphinx_http_domain"]
+sys.path[0:0] = ["../fiesta"]
+import api
+
+extensions = ["sphinxcontrib.autohttp.flask"]
 templates_path = ['_templates']
 source_suffix = '.rst'
 master_doc = 'index'
 project = u'Fiesta API'
 copyright = u'2011, Fiesta Technology, LLC'
-version = '0.9'
+version = '0.9.1'
 release = '0.9'
 exclude_patterns = ['_build']
 pygments_style = 'sphinx'

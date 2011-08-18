@@ -1,116 +1,180 @@
 Authentication
 ==============
 
-Fiesta uses `OAuth 1.0 <http://tools.ietf.org/html/rfc5849>`_ for
-authentication. API clients must possess a valid set of *client
-credentials* in order to interact with the API. Contact
-`api@corp.fiesta.cc <mailto:api@corp.fiesta.cc>`_ to get client
-credentials to use for your application.
+Fiesta uses a recent draft of the `OAuth 2.0
+<http://tools.ietf.org/html/draft-ietf-oauth-v2-20>`_ protocol for
+authentication. We intend to update the API to use final versions of
+both the OAuth 2.0 and `bearer tokens
+<http://tools.ietf.org/html/draft-ietf-oauth-v2-bearer-08>`_ standards
+as they are released.
+
+API clients must possess a valid set of *client credentials* in order
+to interact with the API. Contact `api@corp.fiesta.cc
+<mailto:api@corp.fiesta.cc>`_ to get client credentials to use for
+your application.
 
 Details
 -------
 
 Here are some high-level details about Fiesta's OAuth implementation:
 
-Parameter Transmission
+Supported Grant Types
 
-  The only currently supported mechanism for transmitting OAuth
-  protocol parameters is the HTTP Authorization header.
+  Fiesta supports both authorization code and client credentials grants.
 
-Realm
+User Authorization Endpoint
 
-  The only currently supported value for the *realm* parameter is
-  **all**, which will grant full API access.
+  When requesting user authorization, use ``https://fiesta.cc/authorize``.
 
-Signature Method
+Token Endpoint
 
-  The only currently supported signature method is **PLAINTEXT**.
+  When requesting token credentials, use ``https://api.fiesta.cc/token``.
 
-Temporary Credential Request URI
+.. _client-auth:
 
-  When requesting temporary credentials, use :http:method:`initiate`.
+Client Authentication
+---------------------
 
-User Authorization URI
+Client authentication allows your API client to access resources on
+behalf of itself. Many of the resources available through the API
+don't require User authentication - clients can interact with them
+directly.
 
-  When requesting user authorization, use
-  :http:method:`authorize`.
+Let's go through an example using client authentication; we'll access
+the resource ``https://api.fiesta.cc/hello/client``. Let's try it
+without any authentication:
 
-Token Request URI
+.. code-block:: console
 
-  When requesting token credentials, use :http:method:`token`.
+  $ curl -i https://api.fiesta.cc/hello/client
+  HTTP/1.1 401 UNAUTHORIZED
+  WWW-Authenticate: Bearer realm="fiesta"
+  Content-Length: 0
 
-Endpoints
----------
+We get a **401 UNAUTHORIZED** response, and are instructed that we
+need to present a `token
+<http://tools.ietf.org/html/draft-ietf-oauth-v2-bearer-08>`_ for
+access. Let's use our client credentials to get a token (replace
+*CLIENT_ID* and *CLIENT_SECRET* with your client credentials here):
 
-.. http:method:: POST /oauth/initiate
-  :label-name: initiate
-  :title: /oauth/initiate
+.. code-block:: console
 
-  Get a form-encoded set of temporary credentials.
+  $ curl --user CLIENT_ID:CLIENT_SECRET --data "grant_type=client_credentials" -i https://api.fiesta.cc/token
+  HTTP/1.1 200 OK
+  Content-Type: application/json;charset=UTF-8
+  Cache-Control: no-store
+  Pragma: no-cache
 
-.. http:method:: GET https://fiesta.cc/oauth/authorize?oauth_token
-  :label-name: authorize
-  :title: https://fiesta.cc/oauth/authorize
+  {"access_token": "...", "token_type": "bearer", "expires_in": 3600, "scope": "..."}
 
-  :param oauth_token: ID of temporary credentials to be authorized.
+To get the token, we *POST* to ``https://api.fiesta.cc/token``. We
+specify the **grant_type** as "client_credentials", and include our
+client credentials using HTTP Basic Auth. Instead of using Basic Auth,
+we could have included the credentials by including **client_id** and
+**client_secret** parameters as POST data.
 
-  The URI that a user should be redirected to for authorization.
+The response is JSON. The important bit is the **access_token**
+field - let's use it to try our ``/hello/client`` request again
+(replace *ACCESS_TOKEN* with the token from the above response):
 
-  .. note:: This URI uses the **fiesta.cc** domain rather than
-    **api.fiesta.cc**.
+.. code-block:: console
 
-.. http:method:: POST /oauth/token
-  :label-name: token
-  :title: /oauth/token
+  $ curl --header "Authorization: Bearer ACCESS_TOKEN" -i https://api.fiesta.cc/hello/client
+  HTTP/1.1 200 OK
+  Content-Type: application/json
 
-  Exchange a set of temporary credentials and a verifier for a set of
-  token credentials.
+  {
+    "hello": "Your Client Name"
+  }
 
-.. _two-legged:
+Now that we have included the access token our request works as
+expected. We can continue to use the same token until it expires
+(we'll get a **401 UNAUTHORIZED** when trying to use it), at which
+point we just repeat the above process to get a new token.
 
-Two-legged Authentication
--------------------------
+.. _user-auth:
 
-Two-legged authentication allows an API client to access resources on
-behalf of itself. To authenticate, construct an HTTP Authorization
-header with the following parameters, each of which should be URL
-encoded. Include the constructed header in your request.
+User Authentication
+-------------------
 
-- `oauth_version`: ``"1.0"``
+User authentication is required when accessing resources on behalf of
+a Fiesta user. At a high level, it works the same way as Client
+authentication: you get a token and then include that token in the
+*Authorization* header when accessing the protected resource. The
+difference is in the process of acquiring the token to use - we need
+to get permission from the User in question.
 
-- `oauth_consumer_key`: Your client id.
+.. note:: To use User authentication, your client needs to specify a *Redirect URI*. This is the URI that Fiesta will redirect the user to after they authorize your application. To set a Redirect URI, visit `the settings page <https://fiesta.cc/settings>`_ and click on the "Manage" link for your client.
 
-- `oauth_signature_method`: ``"PLAINTEXT"``
+Let's run through an example; we'll access the resource
+``https://api.fiesta.cc/hello/user``, which requires User
+authentication. Let's try it first without any authentication:
 
-- `oauth_signature`: The concatenation of your client secret and the
-  ampersand (``'&'``) character.
+.. code-block:: console
 
-You may optionally include the `realm` parameter. If present, the
-`realm` must be ``"all"``.
+  $ curl -i https://api.fiesta.cc/hello/user
+  HTTP/1.1 401 UNAUTHORIZED
+  WWW-Authenticate: Bearer realm="fiesta"
 
-Here is an example Authorization header, which is valid for a client
-whose id is *example* and secret is *secret*:
+We can try using a :ref:`Client authentication <client-auth>` token
+(replace *ACCESS_TOKEN* with yours), too:
 
-``OAuth realm="all", oauth_signature="secret%26", oauth_consumer_key="example", oauth_signature_method="PLAINTEXT", oauth_version="1.0"``
+.. code-block:: console
 
-.. _three-legged:
+  $ curl --header "Authorization: Bearer ACCESS_TOKEN" -i https://api.fiesta.cc/hello/user
+  HTTP/1.1 401 UNAUTHORIZED
+  WWW-Authenticate: Bearer realm="fiesta", error="invalid_token", error_description="User authentication required"
 
-Three-legged Authentication
----------------------------
+In this second case we get a specific error message - we can see we
+need to use User authentication to access the resource.
 
-Three-legged authentication is required when accessing resources on
-behalf of a Fiesta user. Any three-legged access requires valid token
-credentials in the Authorization header. The process of acquiring
-token credentials is thoroughly documented in `RFC 5849
-<http://tools.ietf.org/html/rfc5849>`_, but the following is quick
-overview:
+Let's get a User authentication token. The first step is to redirect
+the user to the authorization endpoint, including our client_id as and
+``response_type=code`` as parameters. The fully constructed URL is
+``https://fiesta.cc/authorize?response_type=code&client_id=client_id``
+(with your client id included appropriately). When they are
+redirected, the user will see a screen like this:
 
-#. Client retrieves temporary credentials from :http:method:`initiate`.
+.. image:: authorize.png
+  :align: center
 
-#. Client redirects user to :http:method:`authorize`.
+If the user clicks "Deny" they will be redirected to your Redirect
+URI. Fiesta will add the parameter ``error=access_denied`` to the
+URI's query string, so you'll know the request was denied.
 
-#. User authorizes client, and is redirected to the client's callback URI.
+If the user clicks "Accept" they will be also be redirected to the
+Redirect URI. In this case, however, the query string will include a
+**code** parameter, which we can exchange for an access token (replace
+*CODE* with the code you receive):
 
-#. Client exchanges temporary credentials and verifier for token credentials: :http:method:`token`.
+.. code-block:: console
 
-#. Client uses token credentials to construct an Authorization header that allows access to the user's resources.
+  $ curl --user Ti8I_vyFsWj3AAAA:l1l9CbfizBBzRtkkXRUqE680G8cOW5CSp94Gb1DN --data "grant_type=authorization_code&code=CODE" -i https://api.fiesta.cc/token
+  HTTP/1.1 200 OK
+  Content-Type: application/json;charset=UTF-8
+  Cache-Control: no-store
+  Pragma: no-cache
+
+  {"access_token": "...", "token_type": "bearer", "expires_in": 3600, "scope": "..."}
+
+Now, let's use the access token to try our request for ``/hello/user``
+again (replace *ACCESS_TOKEN* with the value you received above):
+
+.. code-block:: console
+
+  $ curl --header "Authorization: Bearer ACCESS_TOKEN" -i https://api.fiesta.cc/hello/user
+  HTTP/1.1 200 OK
+  Content-Type: application/json
+
+  {
+    "hello": "User Name"
+  }
+
+If the user revokes your client's access, your API requests will
+return **401 UNAUTHORIZED**, and you'll need to re-authorize:
+
+.. code-block:: console
+
+  $ curl --header "Authorization: Bearer ACCESS_TOKEN" -i https://api.fiesta.cc/hello/user
+  HTTP/1.1 401 UNAUTHORIZED
+  WWW-Authenticate: Bearer realm="fiesta", error="invalid_token", error_description="Revoked token"

@@ -16,7 +16,7 @@ There are a several main sections of the API:
 - The :doc:`list-management-api` allows API clients to create and
   manage Fiesta lists.
 
-- The :doc:`message-manipulation-api` allows API clients to modify
+- The :doc:`message-middleware-api` allows API clients to modify
   messages as they are sent to existing Fiesta lists.
 
 Contributing
@@ -32,6 +32,6 @@ contributing please contact `api@corp.fiesta.cc
 
    list-management-api
    authentication
-   message-manipulation-api
+   message-middleware-api
    changelog
 

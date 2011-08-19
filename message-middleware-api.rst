@@ -1,11 +1,11 @@
-Message Manipulation API
-========================
+Message Middleware API
+======================
 
-The Message Manipulation API allows developers to create applications
+The Message Middleware API allows developers to create applications
 that can modify messages as they are sent to existing Fiesta lists.
 
 A valid set of client credentials is required to use the message
-manipulation API. To get client credentials, contact
+middleware API. To get client credentials, contact
 `api@corp.fiesta.cc <mailto:api@corp.fiesta.cc>`_.
 
 .. _message-hook:

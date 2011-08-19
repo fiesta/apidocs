@@ -103,6 +103,14 @@ message that Fiesta should send:
 If either `subject` or `content` is not present the default is the
 corresponding value as originally posted to your application.
 
+Errors
+------
+
+If your message hook returns any non-2xx status code, or if our
+attempt to reach your message hook causes a time-out (right now Fiesta
+waits up to 10 seconds for a response), the message will be processed
+by the normal Fiesta message-handling workflow.
+
 Security / Authorization
 ------------------------
 

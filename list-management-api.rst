@@ -79,5 +79,51 @@ Group
 Endpoints
 ---------
 
-.. autoflask:: api:app
-  :undoc-static:
+.. http:get:: /hello
+
+    Say hello.
+
+    This method exists for testing and documentation
+    examples. Requires no authentication.
+
+.. http:get:: /hello/client
+
+    Say hello to the authorized client.
+
+    This method exists for testing and documentation
+    examples. Requires :ref:`client-auth`.
+
+.. http:get:: /hello/user
+
+    Say hello to the authorized user.
+
+    This method exists for testing and documentation
+    examples. Requires :ref:`user-auth`.
+
+.. http:get:: /address/(string:address)
+
+    Get information about an email address (`address`).
+
+    Requires :ref:`client-auth`.
+
+    :param address: Email address to look up
+    :status 200: Returns an :ref:`address` object.
+    :status 404: The given address doesn't belong to any Fiesta user.
+
+.. http:post:: /group
+
+    Create a new list. The request body is a :ref:`group`.
+
+    If `creator` is not an existing Fiesta user, :ref:`client-auth` is
+    required and a verification email will be sent to the creator to
+    confirm list creation.
+
+    If `creator` is an existing Fiesta user, :ref:`user-auth` is
+    required and a verification email will be sent to the creator to
+    confirm list creation.
+
+    If the API client is a *trusted client*, `creator` is not
+    required. If `creator` is not present, only :ref:`client-auth` is
+    required. Contact `api@corp.fiesta.cc
+    <mailto:api@corp.fiesta.cc>`_ for information on becoming a
+    trusted client.

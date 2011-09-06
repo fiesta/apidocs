@@ -2,10 +2,7 @@
 
 import sys, os
 
-sys.path[0:0] = ["../fiesta"]
-import api
-
-extensions = ["sphinxcontrib.autohttp.flask"]
+extensions = ["sphinxcontrib.httpdomain"]
 templates_path = ['_templates']
 source_suffix = '.rst'
 master_doc = 'index'

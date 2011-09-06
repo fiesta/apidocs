@@ -2,7 +2,7 @@ Authentication
 ==============
 
 Fiesta uses a recent draft of the `OAuth 2.0
-<http://tools.ietf.org/html/draft-ietf-oauth-v2-20>`_ protocol for
+<http://tools.ietf.org/html/draft-ietf-oauth-v2-21>`_ protocol for
 authentication. We intend to update the API to use final versions of
 both the OAuth 2.0 and `bearer tokens
 <http://tools.ietf.org/html/draft-ietf-oauth-v2-bearer-08>`_ standards

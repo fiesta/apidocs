@@ -23,8 +23,8 @@ Contributing
 ------------
 
 This documentation is a community effort; if you are interested in
-contributing please contact `api@corp.fiesta.cc
-<mailto:api@corp.fiesta.cc>`_.
+contributing check out the source on `Github
+<http://github.com/fiesta/apidocs>`_.
 
 
 .. toctree::

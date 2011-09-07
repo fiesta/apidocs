@@ -7,8 +7,8 @@ About
 =====
 
 This is the API documentation for `Fiesta <https://fiesta.cc>`_. It's
-a community project, so if you have improvements or contributions,
-feel free to fork the project.
+a community project - send a pull request if you have improvements or
+contributions.
 
 Building
 ========

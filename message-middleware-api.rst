@@ -2,7 +2,8 @@ Message Middleware API
 ======================
 
 The Message Middleware API allows developers to create applications
-that can modify messages as they are sent to existing Fiesta lists.
+that can modify or intercept messages as they are sent to existing
+Fiesta lists.
 
 A valid set of client credentials is required to use the message
 middleware API. To get client credentials, contact
@@ -53,25 +54,33 @@ JSON data. Here's an example:
 .. code-block:: js
 
   {
-    group: GROUP,
+    group_id: GROUP_ID,
+    group_uri: GROUP_URI,
     group_name: "family",
-    sender: USER,
+    sender_id: USER_ID,
+    sender_uri: USER_URI,
     subject: "Hi guys",
-    content: "This is an example message."
+    text: "This is an example message."
   }
 
-`group` is the group id / URI of the group the message was sent to.
+`group_id` is the group id of the group the message was sent to.
+
+`group_uri` is a URI you can use to get more information about the
+group.
 
 `group_name` is the name used by the sender for the group.
 
 .. note:: Different users might have different names for the same group.
 
-`sender` is the user id / URI of the message's sender.
+`sender_id` is the user id of the message's sender.
+
+`sender_uri` is a URI that you can use to get more information about
+the sender.
 
 `subject` is the message's subject.
 
-`content` is a text representation of the message's content. The
-message text is processed to remove signatures and quoted text.
+`text` is a text representation of the message's content. The message
+text is processed to remove signatures and quoted text.
 
 Responses
 ---------
@@ -97,10 +106,10 @@ message that Fiesta should send:
 
   {
     subject: "Hi again",
-    content: "This is another example message."
+    text: "This is another example message."
   }
 
-If either `subject` or `content` is not present the default is the
+If either `subject` or `text` is not present the default is the
 corresponding value as originally posted to your application.
 
 Errors

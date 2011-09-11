@@ -102,6 +102,8 @@ application is responding with a (possibly modified) message to be
 sent to the list. The response body is a JSON document describing the
 message that Fiesta should send:
 
+.. note:: Be sure to set the *Content-Type* header to ``application/json``.
+
 .. code-block:: js
 
   {

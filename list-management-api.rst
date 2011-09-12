@@ -9,7 +9,7 @@ Basics
 
 All API access is done over HTTPS.
 
-Unless otherwise noted, all documented endpoints use the domain
+Unless otherwise noted, all documented endpoints (URIs) use the domain
 ``api.fiesta.cc``.
 
 All transmitted data is JSON.
@@ -27,21 +27,6 @@ authentication.
 Datatypes
 ---------
 
-.. _address:
-
-Address
-~~~~~~~
-
-.. code-block:: js
-
-  {
-    address: ADDRESS,
-    user: USER
-  }
-
-:ADDRESS: An email address
-:USER: URI of the address' owner.
-
 .. _user:
 
 User
@@ -55,7 +40,7 @@ User
   }
 
 :ADDRESS: Email address of the user.
-:NAME: Name of the user.
+:NAME: Name of the user. (Optional)
 
 .. _group:
 
@@ -66,18 +51,37 @@ Group
 
   {
     creator: CREATOR,
-    name: GROUP_NAME,
     members: [ MEMBERS ],
-    domain: DOMAIN
+    domain: DOMAIN,
+    description: DESCRIPTION
   }
 
 :CREATOR: A :ref:`user` representing the creator of this list.
-:GROUP_NAME: The name of the list. Must be <= 30 characters long.
-:MEMBERS: An array of list members, as :ref:`user` instances.
+:MEMBERS: An array of list memberships, as :ref:`membership` instances.
 :DOMAIN: An optional hostname, if this list is using Fiesta for custom domains.
+:DESCRIPTION: An optional description for the group.
 
-Endpoints
----------
+.. _membership:
+
+Membership
+~~~~~~~~~~
+
+.. code-block:: js
+
+  {
+    user_id: USER_ID,
+    group_id: GROUP_ID,
+    list_name: LIST_NAME,
+    tags: [ TAG ]
+  }
+
+:USER_ID: A :ref:`user` representing a member of this list.
+:GROUP_ID: A :ref:`group` representing the group.
+:LIST_NAME: The group name the user uses to mail the list.
+:TAGS: An array of optional tags that may apply to a member such as muted.
+
+Endpoints (URIs)
+----------------
 
 .. http:get:: /hello
 
@@ -100,19 +104,11 @@ Endpoints
     This method exists for testing and documentation
     examples. Requires :ref:`user-auth`.
 
-.. http:get:: /address/(string:address)
-
-    Get information about an email address (`address`).
-
-    Requires :ref:`client-auth`.
-
-    :param address: Email address to look up
-    :status 200: Returns an :ref:`address` object.
-    :status 404: The given address doesn't belong to any Fiesta user.
-
 .. http:post:: /group
 
-    Create a new list. The request body is a :ref:`group`.
+    Create a new list. The request body consists of a JSON :ref:`group`
+    without the `members` field. Members are added with a different
+    endpoint.
 
     If `creator` is not an existing Fiesta user, :ref:`client-auth` is
     required and a verification email will be sent to the creator to
@@ -122,8 +118,30 @@ Endpoints
     required and a verification email will be sent to the creator to
     confirm list creation.
 
-    If the API client is a *trusted client*, `creator` is not
-    required. If `creator` is not present, only :ref:`client-auth` is
-    required. Contact `api@corp.fiesta.cc
-    <mailto:api@corp.fiesta.cc>`_ for information on becoming a
-    trusted client.
+    The `domain` is to be supplied if the mailing list is for a
+    whitelabeled domain instead of using fiesta.cc. Contact 
+    api@corp.fiesta.cc for information on becoming whitelabeled.
+
+    A `description` is used in place of the standard Fiesta notification
+    when adding new members.
+
+    *IMPORTANT* The returning JSON contains a copy of the created group
+    including the `group_id` Fiesta has assigned to the group. The 
+    `group_id` is your handle for retrieving or modifying any group 
+    related information.
+
+.. http:get:: /group/(string: group_id)
+
+   Retrieve information of a group. This call requires :ref:`client-auth`
+   to be the creator of the group or :ref:`user-auth` of a member from the
+   group with READ scope.
+
+   The returned information models the :ref:`group` datatype.
+
+.. http:post:: /membership/(string: group_id)
+
+   Add a new membership linking a user and a group. The request body
+   consists of a JSON :ref:`user` and a `group_id`.
+
+   A custom welcome message is optional by adding a `welcome_message` dict
+   that may have the following fields: `subject`, `text` and/or `markdown`.

@@ -70,7 +70,10 @@ group.
 
 `group_name` is the name used by the sender for the group.
 
-.. note:: Different users might have different names for the same group.
+.. note:: Different users might have different names for the same
+   group, and different groups can also share the same name for
+   different users. In short, use `group_name` for display purposes
+   but don't use it as an ID.
 
 `sender_id` is the user id of the message's sender.
 
@@ -81,6 +84,14 @@ the sender.
 
 `text` is a text representation of the message's content. The message
 text is processed to remove signatures and quoted text.
+
+The messages are posted as raw JSON, not the default
+``application/x-www-form-urlencoded``. To get the data in PHP, you can
+do something like this:
+
+.. code-block:: php
+
+  $message = json_decode(file_get_contents("php://input"))
 
 Responses
 ---------

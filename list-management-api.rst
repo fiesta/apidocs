@@ -51,13 +51,13 @@ Group
 
   {
     creator: CREATOR,
-    members: [ MEMBERS ],
+    members: [ MEMBERSHIPS ],
     domain: DOMAIN,
     description: DESCRIPTION
   }
 
 :CREATOR: A :ref:`user` representing the creator of this list.
-:MEMBERS: An array of list memberships, as :ref:`membership` instances.
+:MEMBERSHIPS: An array of list memberships, as :ref:`membership` instances.
 :DOMAIN: An optional hostname, if this list is using Fiesta for custom domains.
 :DESCRIPTION: An optional description for the group.
 
@@ -78,7 +78,7 @@ Membership
 :USER_ID: A :ref:`user` representing a member of this list.
 :GROUP_ID: A :ref:`group` representing the group.
 :LIST_NAME: The group name the user uses to mail the list.
-:TAGS: An array of optional tags that may apply to a member such as muted.
+:TAGS: An array of optional tags that may apply to a member e.g. muted.
 
 Endpoints (URIs)
 ----------------
@@ -145,3 +145,26 @@ Endpoints (URIs)
 
    A custom welcome message is optional by adding a `welcome_message` dict
    that may have the following fields: `subject`, `text` and/or `markdown`.
+
+   The returned information models the :ref:`membership` datatype.
+
+.. http:get:: /user/(string: user_id)
+
+   Retrieve information for a user. This call requires :ref:`user-auth`
+   with the READ scope.
+
+   The returned JSON object includes a name, a list of email addresses and
+   a URI linking to the list of memberships.
+
+.. http:get:: /groups_for/(string: user_id)
+
+   Returns a list of all the membership URIs for a particular user.
+
+   This call requires :ref:`user-auth` with a READ scope.
+
+.. http:get:: /users_for/(string: group_id)
+
+   Returns a list of all the membership URIs for a particular group.
+
+   This call requires the same authentication as getting information
+   for the group.

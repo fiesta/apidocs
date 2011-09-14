@@ -29,7 +29,7 @@ Endpoints (URIs)
 
 .. http:post:: /group
 
-    Create a new mailing list.
+    Create a new mailing list. Requires :ref:`user-auth` with READ scope.
 
     Input:
 
@@ -44,16 +44,8 @@ Endpoints (URIs)
         domain: STRING (optional),
         description: STRING (optional)
       }
-    
+
     Members are added separately with a different API call.
-
-    If ``creator`` is not an existing Fiesta user, :ref:`client-auth` is
-    required and a verification email will be sent to the creator to
-    confirm list creation.
-
-    If ``creator`` is an existing Fiesta user, :ref:`user-auth` is
-    required and a verification email will be sent to the creator to
-    confirm list creation.
 
     The ``address`` is the email address for the creating user.
 

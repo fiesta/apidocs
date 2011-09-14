@@ -10,8 +10,8 @@ questions and support please sign up for the `Fiesta API mailing list
 <https://fiesta.cc/list/Tm5Qg6knny5zAAAN>`_.
 
 The purpose of the Fiesta API is to allow programmatic creation and
-management of email groups, or **lists**. The members of a list can
-interact with the list by sending emails to a **list address**. By
+management of email groups, or lists. The members of a list can
+interact with the list by sending emails to a list address. By
 default, an email sent to a list address will be forwarded to the
 other members of the list (just like a traditional mailing list). The
 Fiesta API, however, gives developers the option of altering the way

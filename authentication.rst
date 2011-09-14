@@ -28,7 +28,9 @@ both the OAuth 2.0 and `bearer tokens
 <http://tools.ietf.org/html/draft-ietf-oauth-v2-bearer-08>`_ standards
 as they are released.
 
-Here are some high-level details about Fiesta's OAuth implementation:
+If you've never worked with OAuth before, just skip ahead to
+:ref:`client-auth`. If you're already an OAuth expert, here are some
+high-level details about Fiesta's OAuth implementation:
 
 Supported Grant Types
 

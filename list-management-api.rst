@@ -4,87 +4,252 @@ List Management API
 The list management API allows applications to create and manage
 Fiesta lists.
 
-Basics
-------
-
-All API access is done over HTTPS.
-
-Unless otherwise noted, all documented endpoints (URIs) use the domain
-``api.fiesta.cc``.
-
-All transmitted data is JSON.
-
-
 Authentication
 --------------
 
 For details on authenticating with the API, see
 :doc:`authentication`. All endpoints state whether they require
-:ref:`client <client-auth>` or :ref:`user <user-auth>`
-authentication. User authentication is strictly stronger than client
-authentication.
+:ref:`client <client-auth>` or :ref:`user <user-auth>` auth. User auth
+is strictly stronger than client auth (if an endpoint requires client
+auth and you have a user auth token that will work, but the opposite
+won't). Endpoints that require user auth also state the required
+scope.
 
-Endpoints (URIs)
+Groups and Users
 ----------------
+
+The most important concept for working with the Fiesta API is that of
+a list. Conceptually, a list is just a group of members, so the API
+uses the word **group** (and group_id, group_uri, etc.) when talking
+about lists. A **user** is an individual person who can belong to a
+Fiesta list.
+
+The connection between groups and users is represented using a third
+core structure, called a **membership**. This extra layer of
+indirection is required because users can belong to groups in
+different ways. E.g. each member of a list can use a different list
+address (we call that a **group_name**) for the same list. The
+group_name is stored in each membership, rather than in the group
+itself.
+
+Creating a Group
+----------------
+
+Let's start by creating a new list. This is a two step process: first
+we'll create a group and then we'll add memberships to the
+group. We'll start with :http:post:`/group`:
 
 .. http:post:: /group
 
-    Create a new mailing list. Requires :ref:`user-auth` with READ scope.
+    Create a new mailing list. Requires :ref:`user-auth` with "create"
+    scope.
 
-    Input:
+    Input (as JSON POST data - set the *Content-Type* header to
+    ``application/json``):
 
     .. code-block:: js
 
       {
         creator: {
+                   group_name: STRING,
                    address: EMAIL_ADDRESS,
-                   name: STRING (optional)
+                   display_name: STRING (optional),
+                   welcome_message: WELCOME_MESSAGE (optional)
                  },
-
         domain: STRING (optional),
         description: STRING (optional)
       }
 
-    Members are added separately with a different API call.
+    `group_name` is the group name that will be used for the group's
+    creator. If you're creating a list called "family\@fiesta.cc",
+    `group_name` should be "family".
 
-    The ``address`` is the email address for the creating user.
+    `address` is the email address of the group's creator. This
+    address must be owned by the authenticated user.
 
-    The ``name`` is an optional display name to be attached to the
-    inputted email address.
+    `display_name` (optional) is the name that will be displayed for
+    the group's creator throughout the Fiesta UI. If it's included and
+    the creator does not yet have a display name, it will be set.
 
-    The ``domain`` is to be supplied if the mailing list is for a
-    whitelabeled domain instead of using fiesta.cc. Contact 
-    api@corp.fiesta.cc for information on becoming whitelabeled.
+    `welcome_message` (optional) is a :ref:`welcome-message`. If
+    present, it will be sent to the group's creator instead of the
+    default Fiesta welcome message.
 
-    A ``description`` is used in place of the standard Fiesta notification
-    when adding new members.
+    `domain` (optional) is the domain to use for the list address. The
+    default is "fiesta.cc". To use a custom domain your client must
+    have permission for that domain: contact api@corp.fiesta.cc for
+    information on using custom domains.
 
-    Returns:
+    `description` (optional) is a short (maximum of 200 characters)
+    description of the list. It is included in the default welcome
+    message that is sent to new list members, and elsewhere in the
+    Fiesta UI.
+
+    Returns the following JSON data in the response body:
 
     .. code-block:: js
 
       {
         status: {
-                  code: INT
-                  message: STRING (optional)
+                  code: INT,
+                  message: STRING (sometimes present)
                 },
-        group_id: STRING,
-        uri: URI,
-        description: STRING,
-        members: URI
+        location: URI,
+        data: {
+                group_id: STRING,
+                group_uri: URI,
+                domain: STRING,
+                description: STRING,
+                members: URI
+              }
       }
 
-    The ``group_id`` is the identifier Fiesta has assigned to the group.
-    The ``group_id`` is your handle for retrieving or modifying any group 
-    related information.
+    The status `code` is a numeric code that will match the response's
+    `HTTP status code
+    <http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html>`_. It
+    will be ``201`` if the group was created successfully. It will be
+    ``202`` if the group was created but is still pending activation
+    by the group's owner (they'll need to click a link in an email
+    they were sent).
 
-    The ``status`` is a code whose meaning can be found _here_.
+    `message` will be included if there is an additional explanation
+    of the status code.
 
-    The ``uri`` is a location which the group information cab be found.
+    `group_id` is a unique string that Fiesta has assigned as an
+    identifier for the group. This is the handle you'll need for
+    subsequent interactions with the group, so it's often a good idea
+    to store it somewhere.
 
-    The ``description`` will be echoed if it was provided.
+    `location` and `group_uri` is the endpoint to use to get
+    information about the group. This value will also be present as
+    the HTTP *Location* header.
 
-    ``Members`` is a location where members of the group can be retrieved.
+    `members` is the endpoint to use to get a list of group members or
+    add another member to this group.
+
+    `description` and `domain` are as described above for the method's
+    input.
+
+After creating the group, our list will have a single membership: the
+group's creator. Let's add another member using the `members` URI that
+was returned above:
+
+.. http:post:: /membership/(string: group_id)
+
+    Add a group membership. Requires :ref:`user-auth` with "modify"
+    scope.
+
+    The authenticated user must be a member of the group identified by
+    `group_id`.
+
+    Input (as JSON POST data - set the *Content-Type* header to
+    ``application/json``):
+
+    .. code-block:: js
+
+      {
+        group_name: STRING,
+        address: EMAIL_ADDRESS,
+        display_name: STRING (optional),
+        welcome_message: WELCOME_MESSAGE (optional)
+      }
+
+    `group_name` is the group name that will be used for the new
+    member. If you're creating a list called "family\@fiesta.cc",
+    `group_name` should be "family".
+
+    `address` is the email address of the new member.
+
+    `display_name` (optional) is the name that will be displayed for
+    the new member throughout the Fiesta UI. If it's included and the
+    member does not yet have a display name, it will be set.
+
+    `welcome_message` (optional) is a :ref:`welcome-message`. If
+    present, it will be sent to the new member instead of the default
+    Fiesta welcome message.
+
+    Returns the following JSON data in the response body:
+
+    .. code-block:: js
+
+      {
+        status: {
+                  code: INT,
+                  message: STRING (sometimes present)
+                },
+        location: URI,
+        data: {
+                membership_uri: URI
+                group_id: STRING,
+                group_uri: URI,
+                user_id: STRING,
+                user_uri: URI,
+                group_name: STRING,
+              }
+      }
+
+    The status `code` is a numeric code that will match the response's
+    `HTTP status code
+    <http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html>`_. It
+    will be ``201`` if the member was added successfully. It will be
+    ``202`` if the member was added but the group is still pending
+    activation by the group's owner (they'll need to click a link in
+    an email they were sent). It will be ``204`` if the member was not
+    added (generally because the address is already a group member).
+
+    `message` will be included if there is an additional explanation
+    of the status code.
+
+    `location` and `membership_uri` is the endpoint to use to get
+    information about the membership. This value will also be present
+    as the HTTP *Location* header.
+
+    `group_id` and `group_uri` are the ID and URI of the group.
+
+    `user_id` and `user_uri` are the ID and URI of the (possibly newly
+    created) user.
+
+    `group_name` is the name of the group as used by this user.
+
+.. _welcome-message:
+
+Custom Welcome Message
+----------------------
+
+When a user creates or is added to a group, Fiesta sends a "welcome
+message" introducing the group to that user. The default welcome
+message includes some basic information about replying to a list,
+along with the list's description if it has one.
+
+If you want to use your own custom welcome message that is
+personalized beyond just the description, you can include it for
+:http:post:`/group` and :http:post:`/membership/(string: group_id)`.
+
+The welcome message should be a JSON object with one or more of the
+following fields:
+
+.. code-block:: js
+
+  {
+    subject: STRING,
+    text: STRING,
+    markdown: STRING
+  }
+
+`subject` is the subject to use for the welcome message.
+
+`text` is a plain-text body to use for the welcome message. It will be
+used if present.
+
+`markdown` is a `Markdown
+<http://daringfireball.net/projects/markdown/syntax>`_ formatted body
+to use for the welcome message. If it is present and `text` is absent,
+`markdown` will be used for the the body of the message. An HTML
+version of the email, generated from the Markdown, will also be
+included.
+
+Getting Group/User Information
+------------------------------
 
 .. http:get:: /group/(string: group_id)
 
@@ -93,16 +258,6 @@ Endpoints (URIs)
    group with READ scope.
 
    The returned information models the group datatype.
-
-.. http:post:: /membership/(string: group_id)
-
-   Add a new membership linking a user and a group. The request body
-   consists of a JSON `user` and a `group_id`.
-
-   A custom welcome message is optional by adding a `welcome_message` dict
-   that may have the following fields: `subject`, `text` and/or `markdown`.
-
-   The returned information models the `membership` datatype.
 
 .. http:get:: /user/(string: user_id)
 

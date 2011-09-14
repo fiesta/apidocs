@@ -53,7 +53,7 @@ itself. Let's go through an example - we'll access the resource
 
 .. http:get:: /hello/client
 
-   Say "hello" to an API client. Requires client auth.
+   Say "hello" to an API client. Requires :ref:`client-auth`.
 
 First, let's try it without any authentication just like we did with
 :http:get:`/hello`:
@@ -158,7 +158,8 @@ it) :http:get:`/hello/user`:
 
 .. http:get:: /hello/user
 
-   Say "hello" to the authenticated user. Requires user auth with "read" scope.
+   Say "hello" to the authenticated user. Requires :ref:`user-auth`
+   with "read" scope.
 
 First, let's try it without any authentication:
 

@@ -77,8 +77,8 @@ contributing check out the source on `Github
 .. toctree::
    :hidden:
 
-   list-management-api
    authentication
+   list-management-api
    message-middleware-api
    changelog
 

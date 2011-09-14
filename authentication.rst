@@ -137,21 +137,30 @@ point we just repeat the above process to get a new token.
 
 .. _user-auth:
 
-User Authentication
--------------------
+User Auth
+---------
 
-User authentication is required when accessing resources on behalf of
-a Fiesta user. At a high level, it works the same way as Client
-authentication: you get a token and then include that token in the
+User auth is required when accessing resources on behalf of a Fiesta
+user. At a high level, it works the same way as client auth using the
+OAuth flow: you get a token and then include that token in the
 *Authorization* header when accessing the protected resource. The
 difference is in the process of acquiring the token to use - we need
-to get permission from the User in question.
+to get permission from the user in question.
 
-.. note:: To use User authentication, your client needs to specify a *Redirect URI*. This is the URI that Fiesta will redirect the user to after they authorize your application. To set a Redirect URI, visit `the settings page <https://fiesta.cc/settings>`_ and click on the "Manage" link for your client.
+.. note:: To use user auth, your client needs to specify a *Redirect
+   URI*. This is the URI that Fiesta will redirect the user to after
+   they authorize your application. To set a Redirect URI, visit `the
+   settings page <https://fiesta.cc/settings>`_ and click on the
+   "Manage" link for your client.
 
-Let's run through an example; we'll access the resource
-``https://api.fiesta.cc/hello/user``, which requires User
-authentication. Let's try it first without any authentication:
+Let's run through an example - we'll access the resource (you guessed
+it) :http:get:`/hello/user`:
+
+.. http:get:: /hello/user
+
+   Say "hello" to the authenticated user. Requires user auth with "read" scope.
+
+First, let's try it without any authentication:
 
 .. code-block:: console
 
@@ -159,24 +168,26 @@ authentication. Let's try it first without any authentication:
   HTTP/1.1 401 UNAUTHORIZED
   WWW-Authenticate: Bearer realm="fiesta"
 
-We can try using a :ref:`Client authentication <client-auth>` token
-(replace *ACCESS_TOKEN* with yours), too:
+Let's see what happens if we try using :ref:`client-auth`, too:
 
 .. code-block:: console
 
-  $ curl -H "Authorization: Bearer ACCESS_TOKEN" -i https://api.fiesta.cc/hello/user
+  $ curl --user CLIENT_ID:CLIENT_SECRET -i https://api.fiesta.cc/hello/user
   HTTP/1.1 401 UNAUTHORIZED
-  WWW-Authenticate: Bearer realm="fiesta", error="invalid_token", error_description="User authentication required"
+  WWW-Authenticate: Bearer realm="fiesta"
 
-In this second case we get a specific error message - we can see we
-need to use User authentication to access the resource.
-
-Let's get a User authentication token. The first step is to redirect
-the user to the authorization endpoint, including our client_id as and
+Now that we've seen it go wrong, let's try doing it the right way - by
+getting a user auth token. The first step is to redirect the user to
+the authorization endpoint, including our client_id and
 ``response_type=code`` as parameters. The fully constructed URL is
-``https://fiesta.cc/authorize?response_type=code&client_id=client_id``
-(with your client id included appropriately). When they are
-redirected, the user will see a screen like this:
+``https://fiesta.cc/authorize?response_type=code&client_id=CLIENT_ID``.
+
+.. note:: If you only need specific scopes, you can include a `scope`
+   parameter here as well - the default is to request all available
+   scopes. Each documented endpoint will name the scope that it
+   requires.
+
+When they are redirected, the user will see a screen like this:
 
 .. image:: authorize.png
   :align: center
@@ -192,11 +203,9 @@ Redirect URI. In this case, however, the query string will include a
 
 .. code-block:: console
 
-  $ curl --user Ti8I_vyFsWj3AAAA:l1l9CbfizBBzRtkkXRUqE680G8cOW5CSp94Gb1DN --data "grant_type=authorization_code&code=CODE" -i https://api.fiesta.cc/token
+  $ curl --user CLIENT_ID:CLIENT_SECRET --data "grant_type=authorization_code&code=CODE" -i https://api.fiesta.cc/token
   HTTP/1.1 200 OK
   Content-Type: application/json;charset=UTF-8
-  Cache-Control: no-store
-  Pragma: no-cache
 
   {"access_token": "...", "token_type": "bearer", "expires_in": 3600, "scope": "..."}
 
@@ -213,11 +222,29 @@ again (replace *ACCESS_TOKEN* with the value you received above):
     "hello": "User Name"
   }
 
-If the user revokes your client's access, your API requests will
-return **401 UNAUTHORIZED**, and you'll need to re-authorize:
+That's it! You now have permission to access resources on the user's behalf.
+
+Advanced Topics in Authentication
+---------------------------------
+
+If the user revokes your client's access, or if your token expires,
+your API requests will return **401 UNAUTHORIZED**, and you'll need to
+re-authorize:
 
 .. code-block:: console
 
   $ curl -H "Authorization: Bearer ACCESS_TOKEN" -i https://api.fiesta.cc/hello/user
   HTTP/1.1 401 UNAUTHORIZED
   WWW-Authenticate: Bearer realm="fiesta", error="invalid_token", error_description="Revoked token"
+
+If your token expires re-authorization won't actually require any user
+input: once they are redirected to the authorization endpoint the user
+will be immediately redirected back to your Redirect URI.
+
+There are more options that can be passed as parameters to the
+authorization endpoint: see the `OAuth 2.0
+<http://tools.ietf.org/html/draft-ietf-oauth-v2-21>`_ draft for full
+details. One parameter that might be useful is `state`. If you include
+a `state` parameter when redirecting the user, that same parameter
+will be included when the user is redirected back to your Redirect
+URI.

@@ -1,20 +1,32 @@
 Authentication
 ==============
 
+Any use of the Fiesta API is done using an **API client**. You might
+have a client set up for your company or for an individual
+project. Each client has a set of **client credentials**: a **client
+id** and a **client secret**. Those credentials are presented to
+Fiesta to authenticate your client.
+
+To get client credentials to use for your application contact
+`api@corp.fiesta.cc <mailto:api@corp.fiesta.cc>`_.
+
+The Fiesta API has two levels of authentication: **client auth** and
+**user auth**. Client auth uses your client credentials to prove the
+identity of your client to Fiesta. User auth is used when you want to
+access resources on behalf of a specific user: you need to both prove
+the identity of your client *and* prove that the user has given your
+client permission to act on their behalf. We'll talk about each type
+of auth in detail below.
+
+OAuth
+-----
+
 Fiesta uses a recent draft of the `OAuth 2.0
 <http://tools.ietf.org/html/draft-ietf-oauth-v2-21>`_ protocol for
 authentication. We intend to update the API to use final versions of
 both the OAuth 2.0 and `bearer tokens
 <http://tools.ietf.org/html/draft-ietf-oauth-v2-bearer-08>`_ standards
 as they are released.
-
-API clients must possess a valid set of *client credentials* in order
-to interact with the API. Contact `api@corp.fiesta.cc
-<mailto:api@corp.fiesta.cc>`_ to get client credentials to use for
-your application.
-
-Details
--------
 
 Here are some high-level details about Fiesta's OAuth implementation:
 
@@ -32,17 +44,19 @@ Token Endpoint
 
 .. _client-auth:
 
-Client Authentication
----------------------
+Client Auth
+-----------
 
-Client authentication allows your API client to access resources on
-behalf of itself. Many of the resources available through the API
-don't require User authentication - clients can interact with them
-directly.
+Client auth allows your API client to access resources on behalf of
+itself. Let's go through an example - we'll access the resource
+:http:get:`/hello/client`:
 
-Let's go through an example using client authentication; we'll access
-the resource ``https://api.fiesta.cc/hello/client``. Let's try it
-without any authentication:
+.. http:get:: /hello/client
+
+   Say "hello" to an API client. Requires client auth.
+
+First, let's try it without any authentication just like we did with
+:http:get:`/hello`:
 
 .. code-block:: console
 
@@ -51,30 +65,59 @@ without any authentication:
   WWW-Authenticate: Bearer realm="fiesta"
   Content-Length: 0
 
-We get a **401 UNAUTHORIZED** response, and are instructed that we
-need to present a `token
-<http://tools.ietf.org/html/draft-ietf-oauth-v2-bearer-08>`_ for
-access. Let's use our client credentials to get a token (replace
-*CLIENT_ID* and *CLIENT_SECRET* with your client credentials here):
+We get a **401 UNAUTHORIZED** response: we need client auth to access
+the resource. The simplest way to use client auth is by including our
+credentials using `HTTP Basic Auth <http://www.ietf.org/rfc/rfc2617.txt>`_
+or URL parameters. Let's try Basic Auth first (replace *CLIENT_ID* and
+*CLIENT_SECRET* with your client credentials here and throughout the
+rest of this document):
+
+.. code-block:: console
+
+  $ curl --user CLIENT_ID:CLIENT_SECRET  -i https://api.fiesta.cc/hello/client
+  HTTP/1.1 200 OK
+  Content-Type: application/json
+
+  {
+    "hello": "Your Client Name"
+  }
+
+If it's easier we can use URL parameters instead:
+
+.. code-block:: console
+
+  $ curl -i 'https://api.fiesta.cc/hello/client?client_id=CLIENT_ID&client_secret=CLIENT_SECRET'
+  HTTP/1.1 200 OK
+  Content-Type: application/json
+
+  {
+    "hello": "Your Client Name"
+  }
+
+That's pretty much all there is to it! If you're an OAuth nerd we also
+support the client credentials grant workflow. We think the above
+methods are a bit easier to work with, but if you'd rather use the
+OAuth flow we support the spec (no need to read on if you're happy
+with the Basic Auth / URL parameters methods described above).
+
+First use your client credentials to get a token:
 
 .. code-block:: console
 
   $ curl --user CLIENT_ID:CLIENT_SECRET --data "grant_type=client_credentials" -i https://api.fiesta.cc/token
   HTTP/1.1 200 OK
   Content-Type: application/json;charset=UTF-8
-  Cache-Control: no-store
-  Pragma: no-cache
 
   {"access_token": "...", "token_type": "bearer", "expires_in": 3600, "scope": "..."}
 
 To get the token, we *POST* to ``https://api.fiesta.cc/token``. We
 specify the **grant_type** as "client_credentials", and include our
 client credentials using HTTP Basic Auth. Instead of using Basic Auth,
-we could have included the credentials by including **client_id** and
-**client_secret** parameters as POST data.
+we could have included the credentials by including `client_id` and
+`client_secret` parameters as POST data.
 
 The response is JSON. The important bit is the **access_token**
-field - let's use it to try our ``/hello/client`` request again
+field - let's use it to try our :http:get:`/hello/client` request again
 (replace *ACCESS_TOKEN* with the token from the above response):
 
 .. code-block:: console

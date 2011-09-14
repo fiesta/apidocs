@@ -24,111 +24,75 @@ For details on authenticating with the API, see
 authentication. User authentication is strictly stronger than client
 authentication.
 
-Datatypes
----------
-
-.. _user:
-
-User
-~~~~
-
-.. code-block:: js
-
-  {
-    address: ADDRESS,
-    name: NAME
-  }
-
-:ADDRESS: Email address of the user.
-:NAME: Name of the user. (Optional)
-
-.. _group:
-
-Group
-~~~~~
-
-.. code-block:: js
-
-  {
-    creator: CREATOR,
-    members: [ MEMBERSHIPS ],
-    domain: DOMAIN,
-    description: DESCRIPTION
-  }
-
-:CREATOR: A :ref:`user` representing the creator of this list.
-:MEMBERSHIPS: An array of list memberships, as :ref:`membership` instances.
-:DOMAIN: An optional hostname, if this list is using Fiesta for custom domains.
-:DESCRIPTION: An optional description for the group.
-
-.. _membership:
-
-Membership
-~~~~~~~~~~
-
-.. code-block:: js
-
-  {
-    user_id: USER_ID,
-    group_id: GROUP_ID,
-    list_name: LIST_NAME,
-    tags: [ TAG ]
-  }
-
-:USER_ID: A :ref:`user` representing a member of this list.
-:GROUP_ID: A :ref:`group` representing the group.
-:LIST_NAME: The group name the user uses to mail the list.
-:TAGS: An array of optional tags that may apply to a member e.g. muted.
-
 Endpoints (URIs)
 ----------------
 
-.. http:get:: /hello
-
-    Say hello.
-
-    This method exists for testing and documentation
-    examples. Requires no authentication.
-
-.. http:get:: /hello/client
-
-    Say hello to the authorized client.
-
-    This method exists for testing and documentation
-    examples. Requires :ref:`client-auth`.
-
-.. http:get:: /hello/user
-
-    Say hello to the authorized user.
-
-    This method exists for testing and documentation
-    examples. Requires :ref:`user-auth`.
-
 .. http:post:: /group
 
-    Create a new list. The request body consists of a JSON :ref:`group`
-    without the `members` field. Members are added with a different
-    endpoint.
+    Create a new mailing list.
 
-    If `creator` is not an existing Fiesta user, :ref:`client-auth` is
+    Input:
+
+    .. code-block:: js
+
+      {
+        creator: {
+                   address: EMAIL_ADDRESS,
+                   name: STRING (optional)
+                 },
+
+        domain: STRING (optional),
+        description: STRING (optional)
+      }
+    
+    Members are added separately with a different API call.
+
+    If ``creator`` is not an existing Fiesta user, :ref:`client-auth` is
     required and a verification email will be sent to the creator to
     confirm list creation.
 
-    If `creator` is an existing Fiesta user, :ref:`user-auth` is
+    If ``creator`` is an existing Fiesta user, :ref:`user-auth` is
     required and a verification email will be sent to the creator to
     confirm list creation.
 
-    The `domain` is to be supplied if the mailing list is for a
+    The ``address`` is the email address for the creating user.
+
+    The ``name`` is an optional display name to be attached to the
+    inputted email address.
+
+    The ``domain`` is to be supplied if the mailing list is for a
     whitelabeled domain instead of using fiesta.cc. Contact 
     api@corp.fiesta.cc for information on becoming whitelabeled.
 
-    A `description` is used in place of the standard Fiesta notification
+    A ``description`` is used in place of the standard Fiesta notification
     when adding new members.
 
-    *IMPORTANT* The returning JSON contains a copy of the created group
-    including the `group_id` Fiesta has assigned to the group. The 
-    `group_id` is your handle for retrieving or modifying any group 
+    Returns:
+
+    .. code-block:: js
+
+      {
+        status: {
+                  code: INT
+                  message: STRING (optional)
+                },
+        group_id: STRING,
+        uri: URI,
+        description: STRING,
+        members: URI
+      }
+
+    The ``group_id`` is the identifier Fiesta has assigned to the group.
+    The ``group_id`` is your handle for retrieving or modifying any group 
     related information.
+
+    The ``status`` is a code whose meaning can be found _here_.
+
+    The ``uri`` is a location which the group information cab be found.
+
+    The ``description`` will be echoed if it was provided.
+
+    ``Members`` is a location where members of the group can be retrieved.
 
 .. http:get:: /group/(string: group_id)
 
@@ -136,17 +100,17 @@ Endpoints (URIs)
    to be the creator of the group or :ref:`user-auth` of a member from the
    group with READ scope.
 
-   The returned information models the :ref:`group` datatype.
+   The returned information models the group datatype.
 
 .. http:post:: /membership/(string: group_id)
 
    Add a new membership linking a user and a group. The request body
-   consists of a JSON :ref:`user` and a `group_id`.
+   consists of a JSON `user` and a `group_id`.
 
    A custom welcome message is optional by adding a `welcome_message` dict
    that may have the following fields: `subject`, `text` and/or `markdown`.
 
-   The returned information models the :ref:`membership` datatype.
+   The returned information models the `membership` datatype.
 
 .. http:get:: /user/(string: user_id)
 

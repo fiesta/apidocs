@@ -116,7 +116,7 @@ To get the token, we *POST* to ``https://api.fiesta.cc/token``. We
 specify the **grant_type** as "client_credentials", and include our
 client credentials using HTTP Basic Auth. Instead of using Basic Auth,
 we could have included the credentials by including `client_id` and
-`client_secret` parameters as POST data.
+`client_secret` parameters as POST data or in the query string.
 
 The response is JSON. The important bit is the **access_token**
 field - let's use it to try our :http:get:`/hello/client` request again

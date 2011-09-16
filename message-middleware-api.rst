@@ -123,7 +123,20 @@ message that Fiesta should send:
   }
 
 If either `subject` or `text` is not present the default is the
-corresponding value as originally posted to your application.
+corresponding value as originally posted to your application. If you
+want to include rich content (like links or basic styling), include a
+`markdown` key instead of `text`:
+
+.. code-block:: js
+
+  {
+    subject: "Hi again",
+    markdown: "Hi. **This part is bold.**"
+  }
+
+`markdown` will be processed by a `Markdown
+<http://daringfireball.net/projects/markdown/syntax>`_ processor to
+generate an HTML version of the email.
 
 Errors
 ------

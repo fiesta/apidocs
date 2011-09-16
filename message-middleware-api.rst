@@ -138,7 +138,7 @@ Security / Authorization
 The use of HTTPS for your message hook is recommended, but not
 required.
 
-Fiesta signs all of it's requests to your message hook, so you can
+Fiesta signs all of its requests to your message hook, so you can
 verify that posted messages are actually from Fiesta. There are three
 relevant header fields included with each request:
 

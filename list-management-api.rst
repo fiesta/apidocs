@@ -248,6 +248,22 @@ to use for the welcome message. If it is present and `text` is absent,
 version of the email, generated from the Markdown, will also be
 included.
 
+Removing a List Member
+----------------------
+
+To remove a member from the list just issue a DELETE request on the membership URI:
+
+.. http:delete:: /membership/(string: group_id)/(string: user_id)
+
+    Remove a group membership. Requires :ref:`user-auth` with "modify"
+    scope.
+
+    The authenticated user must be a member of the group identified by
+    `group_id`.
+
+    Responds with status code ``200`` if the membership either didn't
+    exist or was successfully removed.
+
 Getting Group/User Information
 ------------------------------
 

@@ -18,6 +18,11 @@ the identity of your client *and* prove that the user has given your
 client permission to act on their behalf. We'll talk about each type
 of auth in detail below.
 
+Most API methods in place require User authentication. Client authentication
+is sufficient only in the case your client is marked as a `trusted` client.
+If you've contacted us and we've labeled you as a trusted client you will
+find extra notes sprinkled throughout the documentation.
+
 OAuth
 -----
 
@@ -34,7 +39,8 @@ high-level details about Fiesta's OAuth implementation:
 
 Supported Grant Types
 
-  Fiesta supports both authorization code and client credentials grants.
+  Fiesta supports authorization code, client credentials and 
+  refresh token grants.
 
 User Authorization Endpoint
 
@@ -210,7 +216,10 @@ Redirect URI. In this case, however, the query string will include a
   HTTP/1.1 200 OK
   Content-Type: application/json;charset=UTF-8
 
-  {"access_token": "...", "token_type": "bearer", "expires_in": 3600, "scope": "..."}
+  {"access_token": "...", "refresh_token": "..." "token_type": "bearer", "expires_in": 3600, "scope": "..."}
+
+.. note:: See :ref:`refresh-token` for generating new user access tokens
+   when the original expires and the user is offline.
 
 Now, let's use the access token to try our request for ``/hello/user``
 again (replace *ACCESS_TOKEN* with the value you received above):
@@ -227,12 +236,50 @@ again (replace *ACCESS_TOKEN* with the value you received above):
 
 That's it! You now have permission to access resources on the user's behalf.
 
-Advanced Topics in Authentication
----------------------------------
+Expired Token
+-------------
 
-If the user revokes your client's access, or if your token expires,
-your API requests will return **401 UNAUTHORIZED**, and you'll need to
-re-authorize:
+If your token expires there are two ways to be granted a fresh token. The
+first is redirecting the user's browser back to Fiesta's ``/authorize`` endpoint.
+Re-authorization in this way won't actually require any user
+input: once they are redirected to the authorization endpoint the user
+will be immediately redirected back to your Redirect URI.
+
+If a user is offline then using a :ref:`refresh-token` is what you would want
+to use instead.
+
+.. _refresh-token:
+
+Refresh Token
+-------------
+
+User access tokens tend to expire within a few hours of them being granted. If
+your application needs to take action on behalf of a user that is offline, a
+refresh token is the solution. When a client is granted a user access token
+the response also contains a ``refresh_token``. A refresh token can be
+exchanged for a fresh user access token in addition to a new refresh token.
+
+.. code-block:: console
+
+   $ curl --user CLIENT_ID:CLIENT_SECRET --data "grant_type=refresh_token&code=REFRESH_CODE" -i https://api.fiesta.cc/token
+   HTTP/1.1 200 OK
+  Content-Type: application/json;charset=UTF-8
+
+  {"access_token": "...", "refresh_token": "..." "token_type": "bearer", "expires_in": 3600, "scope": "..."}
+
+
+.. note:: For security reasons refresh tokens must be discarded after
+   being used. A new refresh token is supplied and must be used the next
+   time you want a fresh user access token.
+
+Refresh tokens can be exchanged indefinitely until a user revokes access
+to your application.
+
+Revoked Tokens
+--------------
+
+If the user revokes your client's access your API requests will return
+**401 UNAUTHORIZED**, and you'll need to re-authorize:
 
 .. code-block:: console
 
@@ -240,9 +287,8 @@ re-authorize:
   HTTP/1.1 401 UNAUTHORIZED
   WWW-Authenticate: Bearer realm="fiesta", error="invalid_token", error_description="Revoked token"
 
-If your token expires re-authorization won't actually require any user
-input: once they are redirected to the authorization endpoint the user
-will be immediately redirected back to your Redirect URI.
+Other Information
+-----------------
 
 There are more options that can be passed as parameters to the
 authorization endpoint: see the `OAuth 2.0

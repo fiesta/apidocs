@@ -134,6 +134,11 @@ After creating the group, our list will have a single membership: the
 group's creator. Let's add another member using the `members` URI that
 was returned above:
 
+    .. note:: Trusted clients may create a group without user access. To do
+              this the client must not supply a creator. The only available
+              paramters are a domain and a group description. If a creator
+              is supplied, a user access token is expected.
+
 .. http:post:: /membership/(string: group_id)
 
     Add a group membership. Requires :ref:`user-auth` with "modify"
@@ -210,6 +215,10 @@ was returned above:
     created) user.
 
     `group_name` is the name of the group as used by this user.
+
+    .. note:: Trusted clients do not need :ref:`user-auth` for this API
+              call. A trusted client only needs to have created the group
+              to be able to add members to the group.
 
 .. _welcome-message:
 

@@ -44,7 +44,7 @@ group. We'll start with :http:post:`/group`:
     Create a new mailing list. Requires :ref:`user-auth` with "create"
     scope.
 
-    Input (as JSON POST data - set the *Content-Type* header to
+    Input (as JSON POST data with *Content-Type*
     ``application/json``):
 
     .. code-block:: js
@@ -71,9 +71,13 @@ group. We'll start with :http:post:`/group`:
     the group's creator throughout the Fiesta UI. If it's included and
     the creator does not yet have a display name, it will be set.
 
-    `welcome_message` (optional) is a :ref:`welcome-message`. If
-    present, it will be sent to the group's creator instead of the
-    default Fiesta welcome message.
+    `welcome_message` (optional) is a :ref:`custom welcome message
+    <message>`. If not present, the default Fiesta welcome message
+    will be sent to the creator: this includes some basic info about
+    the list and the list description. If `welcome_message` is a
+    :ref:`Message <message>` instance, the specified message will be sent to the
+    creator instead. If it's ``null`` or ``false`` no welcome message
+    will be sent.
 
     `domain` (optional) is the domain to use for the list address. The
     default is "fiesta.cc". To use a custom domain your client must
@@ -147,7 +151,7 @@ was returned above:
     The authenticated user must be a member of the group identified by
     `group_id`.
 
-    Input (as JSON POST data - set the *Content-Type* header to
+    Input (as JSON POST data with *Content-Type*
     ``application/json``):
 
     .. code-block:: js
@@ -169,9 +173,13 @@ was returned above:
     the new member throughout the Fiesta UI. If it's included and the
     member does not yet have a display name, it will be set.
 
-    `welcome_message` (optional) is a :ref:`welcome-message`. If
-    present, it will be sent to the new member instead of the default
-    Fiesta welcome message.
+    `welcome_message` (optional) is a :ref:`custom welcome message
+    <message>`. If not present, the default Fiesta welcome message
+    will be sent: this includes some basic info about the list and the
+    list description. If `welcome_message` is a :ref:`Message <message>`
+    instance, the specified message will be sent to the new member
+    instead. If it's ``null`` or ``false`` no welcome message will be
+    sent.
 
     Returns the following JSON data in the response body:
 
@@ -220,22 +228,13 @@ was returned above:
               call. A trusted client only needs to have created the group
               to be able to add members to the group.
 
-.. _welcome-message:
+.. _message:
 
-Custom Welcome Message
-----------------------
+Messages
+--------
 
-When a user creates or is added to a group, Fiesta sends a "welcome
-message" introducing the group to that user. The default welcome
-message includes some basic information about replying to a list,
-along with the list's description if it has one.
-
-If you want to use your own custom welcome message that is
-personalized beyond just the description, you can include it for
-:http:post:`/group` and :http:post:`/membership/(string: group_id)`.
-
-The welcome message should be a JSON object with one or more of the
-following fields:
+A message is a representation of an email for Fiesta to send. It
+should be a JSON object with one or more of the following fields:
 
 .. code-block:: js
 
@@ -245,17 +244,33 @@ following fields:
     markdown: STRING
   }
 
-`subject` is the subject to use for the welcome message.
+`subject` is the subject to use for the message.
 
-`text` is a plain-text body to use for the welcome message. It will be
-used if present.
+`text` is a plain-text body to use for the message. It will be used if
+present.
 
 `markdown` is a `Markdown
 <http://daringfireball.net/projects/markdown/syntax>`_ formatted body
-to use for the welcome message. If it is present and `text` is absent,
+to use for the message. If it is present and `text` is absent,
 `markdown` will be used for the the body of the message. An HTML
 version of the email, generated from the Markdown, will also be
 included.
+
+Removing a List Member
+----------------------
+
+To remove a member from the list just issue a DELETE request on the membership URI:
+
+.. http:delete:: /membership/(string: group_id)/(string: user_id)
+
+    Remove a group membership. Requires :ref:`user-auth` with "modify"
+    scope.
+
+    The authenticated user must be a member of the group identified by
+    `group_id`.
+
+    Responds with status code ``200`` if the membership either didn't
+    exist or was successfully removed.
 
 Getting Group/User Information
 ------------------------------

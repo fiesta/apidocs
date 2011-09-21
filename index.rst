@@ -7,7 +7,7 @@ Overview
 This documentation describes the official `Fiesta
 <https://fiesta.cc>`_ API. The API is in active development; for
 questions and support please sign up for the `Fiesta API mailing list
-<https://fiesta.cc/list/Tm5Qg6knny5zAAAN>`_.
+<https://fiesta.cc/~api>`_.
 
 The purpose of the Fiesta API is to allow programmatic creation and
 management of email groups, or lists. The members of a list can

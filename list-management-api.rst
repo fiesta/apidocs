@@ -134,14 +134,16 @@ group. We'll start with :http:post:`/group`:
     `description` and `domain` are as described above for the method's
     input.
 
+.. note:: If your client is :ref:`trusted <trusted-clients>`, you can
+   create a group with :ref:`client <client-auth>` instead
+   of :ref:`user <user-auth>` auth. In that case, you should not include
+   the `creator` field; the only available parameters are `domain` and
+   a `description`. If a creator is supplied, a user access token is
+   required.
+
 After creating the group, our list will have a single membership: the
 group's creator. Let's add another member using the `members` URI that
 was returned above:
-
-    .. note:: Trusted clients may create a group without user access. To do
-              this the client must not supply a creator. The only available
-              paramters are a domain and a group description. If a creator
-              is supplied, a user access token is expected.
 
 .. http:post:: /membership/(string: group_id)
 
@@ -224,9 +226,10 @@ was returned above:
 
     `group_name` is the name of the group as used by this user.
 
-    .. note:: Trusted clients do not need :ref:`user-auth` for this API
-              call. A trusted client only needs to have created the group
-              to be able to add members to the group.
+.. note:: If your client is :ref:`trusted <trusted-clients>`, you can
+   use :ref:`client <client-auth>` instead of :ref:`user <user-auth>`
+   auth for this call, as long as your client was the original creator
+   of the group.
 
 .. _message:
 

@@ -18,10 +18,16 @@ the identity of your client *and* prove that the user has given your
 client permission to act on their behalf. We'll talk about each type
 of auth in detail below.
 
-Most API methods in place require User authentication. Client authentication
-is sufficient only in the case your client is marked as a `trusted` client.
-If you've contacted us and we've labeled you as a trusted client you will
-find extra notes sprinkled throughout the documentation.
+.. _trusted-clients:
+
+Most of the API methods currently in place require user auth. For
+example, to create a new list you'll need the authorization of the
+person you are creating the list on behalf of. In some cases, clients
+need to create or update lists on behalf of themselves, without
+requiring user auth. This is supported, but you'll need to ask us for
+special permission to create these "ownerless" lists. Throughout this
+documentation you'll see notes about `trusted` clients. Those notes
+are for clients who have been granted this special permission.
 
 OAuth
 -----
@@ -253,11 +259,11 @@ to use instead.
 Refresh Token
 -------------
 
-User access tokens tend to expire within a few hours of them being granted. If
-your application needs to take action on behalf of a user that is offline, a
-refresh token is the solution. When a client is granted a user access token
-the response also contains a ``refresh_token``. A refresh token can be
-exchanged for a fresh user access token in addition to a new refresh token.
+User access tokens expire within a few hours of being granted. If your
+application needs to take action on behalf of a user that is offline,
+you can use a **refresh token**. When you are granted a user access
+token the response also contains a ``refresh_token``. The refresh
+token can be exchanged for a fresh user access token at any time.
 
 .. code-block:: console
 
@@ -269,11 +275,11 @@ exchanged for a fresh user access token in addition to a new refresh token.
 
 
 .. note:: For security reasons refresh tokens must be discarded after
-   being used. A new refresh token is supplied and must be used the next
-   time you want a fresh user access token.
+   being used. A new refresh token is included in the response and
+   must be used the next time you want a fresh user access token.
 
-Refresh tokens can be exchanged indefinitely until a user revokes access
-to your application.
+Refresh tokens can be exchanged indefinitely, unless a user revokes
+access for your application.
 
 Revoked Tokens
 --------------

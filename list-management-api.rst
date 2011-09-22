@@ -100,7 +100,7 @@ group. We'll start with :http:post:`/group`:
                 },
         location: URI,
         data: {
-                group_id: STRING,
+                group_id: GROUP_ID,
                 group_uri: URI,
                 domain: STRING,
                 description: STRING,
@@ -195,9 +195,9 @@ was returned above:
         location: URI,
         data: {
                 membership_uri: URI
-                group_id: STRING,
+                group_id: GROUP_ID,
                 group_uri: URI,
-                user_id: STRING,
+                user_id: USER_ID,
                 user_uri: URI,
                 group_name: STRING,
               }
@@ -275,34 +275,96 @@ To remove a member from the list just issue a DELETE request on the membership U
     Responds with status code ``200`` if the membership either didn't
     exist or was successfully removed.
 
+    .. note:: A trusted client can remove members from a group it created.
+
 Getting Group/User Information
 ------------------------------
 
 .. http:get:: /group/(string: group_id)
 
-   Retrieve information of a group. This call requires :ref:`client-auth`
-   to be the creator of the group or :ref:`user-auth` of a member from the
-   group with READ scope.
+   Retrieve information of a group. This call requires :ref:`user-auth` of
+   a member of the group with READ scope.
 
-   The returned information models the group datatype.
+   .. note:: A trusted client can make this call for groups it has created.
+
+   Returns:
+
+    .. code-block:: js
+
+      {
+        group_id: GROUP_ID,
+        group_uri: URI,
+        domain: STRING,
+        description: STRING,
+        members: URI
+      }
+
+
+.. http:get:: /membership/(string: group_id)
+
+   Retrieve a list of all the membership URIs for a particular group.
+
+   This call requires :ref:`user-auth` with a READ scope from user within
+   the group.
+
+   .. note:: A trusted client can make this call for groups it has created.
+
+   Returns:
+
+   .. code-block:: js
+
+     {
+       memberships: [{
+                       group_id: GROUP_ID,
+                       group_uri: URI,
+                       user_id: USER_ID,
+                       user_uri: URI,
+                       membership_uri: URI
+                     }, ...]
+     }
+
 
 .. http:get:: /user/(string: user_id)
 
-   Retrieve information for a user. This call requires :ref:`user-auth`
-   with the READ scope.
+   Retrieve information for a user. If the client does not have :ref:`user-auth`
+   just a list of scopes the user has authorized for the client is returned:
 
-   The returned JSON object includes a name, a list of email addresses and
-   a URI linking to the list of memberships.
+   .. code-block:: js
+
+     {
+       user_id: USER_ID,
+       scopes: SCOPES
+     }
+
+   If the client has :ref:`user-auth` with a READ scope, the following is
+   returned:
+
+   .. code-block:: js
+
+     {
+       user_id: USER_ID,
+       scopes: SCOPES
+       name: STRING,
+       memberships: URI,
+     }
+
 
 .. http:get:: /groups_for/(string: user_id)
 
-   Returns a list of all the membership URIs for a particular user.
+   Returns a list of all the memberships for a particular user.
 
    This call requires :ref:`user-auth` with a READ scope.
 
-.. http:get:: /users_for/(string: group_id)
+   Returns:
 
-   Returns a list of all the membership URIs for a particular group.
+   .. code-block:: js
 
-   This call requires the same authentication as getting information
-   for the group.
+     {
+       memberships: [{
+                       group_id: GROUP_ID,
+                       group_uri: URI,
+                       user_id: USER_ID,
+                       user_uri: URI,
+                       membership_uri: URI
+                     }, ...]
+     }

@@ -76,8 +76,10 @@ First, let's try it without any authentication just like we did with
 
   $ curl -i https://api.fiesta.cc/hello/client
   HTTP/1.1 401 UNAUTHORIZED
-  WWW-Authenticate: Bearer realm="fiesta"
-  Content-Length: 0
+  WWW-Authenticate: Basic realm="fiesta"
+  Content-Length: 98
+
+  {"status": {"code": 401}, "error_description": "No client credentials", "error": "invalid_client"}
 
 We get a **401 UNAUTHORIZED** response: we need client auth to access
 the resource. The simplest way to use client auth is by including our
@@ -122,7 +124,7 @@ First use your client credentials to get a token:
   HTTP/1.1 200 OK
   Content-Type: application/json;charset=UTF-8
 
-  {"access_token": "...", "token_type": "bearer", "expires_in": 3600, "scope": "..."}
+  {"access_token": "...", "token_type": "bearer", "expires_in": 3600}
 
 To get the token, we *POST* to ``https://api.fiesta.cc/token``. We
 specify the **grant_type** as "client_credentials", and include our
@@ -182,14 +184,15 @@ First, let's try it without any authentication:
   $ curl -i https://api.fiesta.cc/hello/user
   HTTP/1.1 401 UNAUTHORIZED
   WWW-Authenticate: Bearer realm="fiesta"
+  Content-Length: 0
 
 Let's see what happens if we try using :ref:`client-auth`, too:
 
 .. code-block:: console
 
   $ curl --user CLIENT_ID:CLIENT_SECRET -i https://api.fiesta.cc/hello/user
-  HTTP/1.1 401 UNAUTHORIZED
-  WWW-Authenticate: Bearer realm="fiesta"
+  WWW-Authenticate: Bearer realm="fiesta", error="invalid_token", error_description="User authentication required"
+  Content-Length: 0
 
 Now that we've seen it go wrong, let's try doing it the right way - by
 getting a user auth token. The first step is to redirect the user to
@@ -198,9 +201,9 @@ the authorization endpoint, including our client_id and
 ``https://fiesta.cc/authorize?response_type=code&client_id=CLIENT_ID``.
 
 .. note:: If you only need specific scopes, you can include a `scope`
-   parameter here as well - the default is to request all available
-   scopes. Each documented endpoint will name the scope that it
-   requires.
+   parameter here as well with a comma delimited list of scopes for
+   the value - the default is to request all available scopes. Each
+   documented endpoint will name the scope that it requires.
 
 When they are redirected, the user will see a screen like this:
 

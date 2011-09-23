@@ -289,15 +289,48 @@ Getting Group/User Information
 
    Returns:
 
-    .. code-block:: js
+   .. code-block:: js
 
-      {
-        group_id: GROUP_ID,
-        group_uri: URI,
-        domain: STRING,
-        description: STRING,
-        members: URI
-      }
+     {
+       group_id: GROUP_ID,
+       group_uri: URI,
+       domain: STRING,
+       description: STRING,
+       members: URI
+     }
+
+.. http:get:: /membership/(string: group_id)/(string: user_id)
+
+   Retrieve specific information on a membership between a group and member.
+
+   This call requires :ref:`user-auth` with a READ scope from any user
+   within the group.
+
+   Returns:
+
+   .. code-block:: js
+
+     {
+       group_id: GROUP_ID,
+       group_uri: URI,
+       user_id: USER_ID,
+       user_uri: URI
+     }
+
+   If this is called with the :ref:`user-auth` with READ scope of the user
+   being queried, the group name for the user is also added.
+
+   Returns:
+
+   .. code-block:: js
+
+     {
+       group_id: GROUP_ID,
+       group_uri: URI,
+       user_id: USER_ID,
+       user_uri: URI,
+       group_name: STRING
+     }
 
 
 .. http:get:: /membership/(string: group_id)

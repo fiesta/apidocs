@@ -231,6 +231,59 @@ was returned above:
    auth for this call, as long as your client was the original creator
    of the group.
 
+
+Now that we've added a few members to the group, we should send them an
+email with a link to your favorite webcomic.
+
+.. http:post:: /message/(string: group_id)
+
+    Send an email to the group. Requires :ref:`user-auth` with "create"
+    scope.
+
+    The authenticated user must be a member of the group identified by
+    `group_id`. The email is sent on behalf of the authenticated user.
+
+    Input (as JSON POST data with *Content-Type*
+    ``aplication/json``):
+
+    .. code-block:: js
+
+      {
+        message: MESSAGE
+      }
+
+    `message` is a :ref:`message` object.
+
+    Returns:
+
+    .. code-block:: js
+
+      {
+        status: {
+                  code: INT,
+                  message: STRING (sometimes present)
+                },
+        data: {
+                group_id: GROUP_ID,
+                group_uri: URI,
+                message: MESSAGE,
+              }
+      }
+
+    The status `code` is a numeric code that will match the response's
+    `HTTP status code
+    <http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html>`_. It
+    will be ``200`` if the message was sent successfully. It will be
+    ``400`` if the message failed to send.
+
+    `message (Status)` will be included if there is an additional explanation
+    of the status code.
+
+    `group_id` and `group_uri` are the ID and URI of the group.
+
+    `message (Data)` will be a :ref:`message` of the email sent.
+
+
 .. _message:
 
 Messages
@@ -258,6 +311,10 @@ to use for the message. If it is present and `text` is absent,
 `markdown` will be used for the the body of the message. An HTML
 version of the email, generated from the Markdown, will also be
 included.
+
+.. note:: The reason for only using text or markdown is that many mail
+    servers mark messages as spam if the plaintext and html parts of the
+    email differ too greatly in their content.
 
 Removing a List Member
 ----------------------

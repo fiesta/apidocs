@@ -55,12 +55,15 @@ JSON data. Here's an example:
 
   {
     group_id: GROUP_ID,
-    group_uri: GROUP_URI,
+    group_uri: URI,
     group_name: "family",
     sender_id: USER_ID,
-    sender_uri: USER_URI,
+    sender_uri: URI,
+    message_id: STRING,
+    thread_id: STRING,
+    parent_id: STRING or null,
     subject: "Hi guys",
-    text: "This is an example message."
+    text: "This is an example message.",
   }
 
 `group_id` is the group id of the group the message was sent to.
@@ -79,6 +82,17 @@ group.
 
 `sender_uri` is a URI that you can use to get more information about
 the sender.
+
+`message_id` is a unique ID for this message, as a string.
+
+`thread_id` is a unique ID for this thread, as a string. Replies to
+this message (including chained replies) will all have the same
+`thread_id`.
+
+`parent_id` is either a string matching the `message_id` of the
+message that this message is in reply to, or ``null`` if this message
+is not a reply or is in reply to a message that wasn't sent to this
+list.
 
 `subject` is the message's subject.
 

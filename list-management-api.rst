@@ -141,6 +141,9 @@ group. We'll start with :http:post:`/group`:
    a `description`. If a creator is supplied, a user access token is
    required.
 
+Adding Members
+--------------
+
 After creating the group, our list will have a single membership: the
 group's creator. Let's add another member using the `members` URI that
 was returned above:
@@ -231,6 +234,9 @@ was returned above:
    auth for this call, as long as your client was the original creator
    of the group.
 
+
+Sending Messages
+----------------
 
 Now that we've added a few members to the group, we should send them an
 email with a link to your favorite webcomic.

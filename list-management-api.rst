@@ -272,6 +272,8 @@ email with a link to your favorite webcomic.
         data: {
                 group_id: GROUP_ID,
                 group_uri: URI,
+                message_id: STRING,
+                thread_id: STRING,
                 message: MESSAGE,
               }
       }
@@ -287,7 +289,14 @@ email with a link to your favorite webcomic.
 
     `group_id` and `group_uri` are the ID and URI of the group.
 
-    `message (Data)` will be a :ref:`message` of the email sent.
+    `message_id` is a unique identifier (as a string) assigned to the
+    sent message.
+
+    `thread_id` is a unique identifier (as a string) assigned to the
+    thread created by the sent message.
+
+    `message (Data)` will be a :ref:`Message <message>` representing
+    the email sent.
 
 
 .. _message:

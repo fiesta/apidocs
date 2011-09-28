@@ -64,6 +64,7 @@ JSON data. Here's an example:
     parent_id: STRING or null,
     subject: "Hi guys",
     text: "This is an example message.",
+    attachments: [ATTACHMENT]
   }
 
 `group_id` is the group id of the group the message was sent to.
@@ -98,6 +99,9 @@ list.
 
 `text` is a text representation of the message's content. The message
 text is processed to remove signatures and quoted text.
+
+`attachments` is a list of :ref:`attachments` that were sent with the
+message.
 
 The messages are posted as raw JSON, not the default
 ``application/x-www-form-urlencoded``. To get the data in PHP, you can
@@ -151,6 +155,29 @@ want to include rich content (like links or basic styling), include a
 `markdown` will be processed by a `Markdown
 <http://daringfireball.net/projects/markdown/syntax>`_ processor to
 generate an HTML version of the email.
+
+.. _attachments:
+
+Attachments
+-----------
+
+.. code-block:: js
+
+  {
+    content_type: STRING,
+    filename: STRING,
+    content_length: INT,
+    content: STRING
+  }
+
+`content_type` is the MIME type of the attached file.
+
+`filename` is the file system filename for the attached file.
+
+`content_length` is the number of bytes in the base64 encoded `content` field.
+
+`content` is the base64 encoded binary data of the attached file.
+We decode all incoming attachment data and send it as base64 encoded data.
 
 Errors
 ------

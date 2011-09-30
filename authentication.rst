@@ -270,7 +270,7 @@ token can be exchanged for a fresh user access token at any time.
 
 .. code-block:: console
 
-   $ curl --user CLIENT_ID:CLIENT_SECRET --data "grant_type=refresh_token&code=REFRESH_CODE" -i https://api.fiesta.cc/token
+   $ curl --user CLIENT_ID:CLIENT_SECRET --data "grant_type=refresh_token&refresh_token=REFRESH_TOKEN" -i https://api.fiesta.cc/token
    HTTP/1.1 200 OK
   Content-Type: application/json;charset=UTF-8
 

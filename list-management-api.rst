@@ -212,7 +212,7 @@ was returned above:
     will be ``201`` if the member was added successfully. It will be
     ``202`` if the member was added but the group is still pending
     activation by the group's owner (they'll need to click a link in
-    an email they were sent). It will be ``204`` if the member was not
+    an email they were sent). It will be ``200`` if the member was not
     added (generally because the address is already a group member).
 
     `message` will be included if there is an additional explanation

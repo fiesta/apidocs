@@ -254,8 +254,8 @@ Re-authorization in this way won't actually require any user
 input: once they are redirected to the authorization endpoint the user
 will be immediately redirected back to your Redirect URI.
 
-If a user is offline then using a :ref:`refresh-token` is what you would want
-to use instead.
+If a user is offline then you'll need to use a :ref:`refresh-token` to
+get a fresh access token. This requires "offline" scope.
 
 .. _refresh-token:
 
@@ -264,9 +264,10 @@ Refresh Token
 
 User access tokens expire within a few hours of being granted. If your
 application needs to take action on behalf of a user that is offline,
-you can use a **refresh token**. When you are granted a user access
-token the response also contains a ``refresh_token``. The refresh
-token can be exchanged for a fresh user access token at any time.
+you should request the "offline" scope. If your application is granted
+"offline" scope, whenever you get an access token the response also
+contains a ``refresh_token``. The refresh token can be exchanged for a
+fresh user access token at any time.
 
 .. code-block:: console
 

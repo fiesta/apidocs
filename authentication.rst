@@ -245,6 +245,15 @@ again (replace *ACCESS_TOKEN* with the value you received above):
 
 That's it! You now have permission to access resources on the user's behalf.
 
+Hinting
+-------
+
+If you already know the email address of the user whose authorization
+you're requesting, you can provide it as a *hint* to Fiesta. Hinting
+makes the authorization flow a little simpler for the user. To hint,
+just include the email address as the value of the ``hint`` query
+parameter when redirecting the user to ``/authorize``.
+
 Expired Token
 -------------
 

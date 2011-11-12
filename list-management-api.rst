@@ -64,12 +64,14 @@ group. We'll start with :http:post:`/group`:
     creator. If you're creating a list called "family\@fiesta.cc",
     `group_name` should be "family".
 
-    `address` is the email address of the group's creator. This
-    address must be owned by the authenticated user.
+    `address` is the email address of the group's creator
+    (e.g. "mike@corp.fiesta.cc"). This address must be owned by the
+    authenticated user.
 
     `display_name` (optional) is the name that will be displayed for
-    the group's creator throughout the Fiesta UI. If it's included and
-    the creator does not yet have a display name, it will be set.
+    the group's creator throughout the Fiesta UI (e.g. "Mike
+    Dirolf"). If it's included and the creator does not yet have a
+    display name, it will be set.
 
     `welcome_message` (optional) is a :ref:`custom welcome message
     <message>`. If not present, the default Fiesta welcome message
@@ -87,7 +89,9 @@ group. We'll start with :http:post:`/group`:
     `description` (optional) is a short (maximum of 200 characters)
     description of the list. It is included in the default welcome
     message that is sent to new list members, and elsewhere in the
-    Fiesta UI.
+    Fiesta UI. If you are making a group for the Fantastic Four the
+    group_name could be something like "f4" and the description could
+    be "Fantastic Four".
 
     Returns the following JSON data in the response body:
 

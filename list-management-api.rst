@@ -328,9 +328,11 @@ to use for the message. If it is present and `text` is absent,
 version of the email, generated from the Markdown, will also be
 included.
 
-.. note:: The reason for only using text or markdown is that many mail
-    servers mark messages as spam if the plaintext and html parts of the
-    email differ too greatly in their content.
+.. note:: There is currently no way to include raw HTML in
+   messages. The best alternative is to send the message as markdown,
+   which will be used to generate HTML. If you feel you need raw HTML,
+   please get in touch on the `support list
+   <https://fiesta.cc/~api>`_.
 
 Removing a List Member
 ----------------------

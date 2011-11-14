@@ -237,8 +237,8 @@ was returned above:
 Sending Messages
 ----------------
 
-Now that we've added a few members to the group, we should send them an
-email with a link to your favorite webcomic.
+Now that we've added a few members to the group, let's see how to send
+messages to them.
 
 .. http:post:: /message/(string: group_id)
 

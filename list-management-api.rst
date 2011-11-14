@@ -244,7 +244,7 @@ email with a link to your favorite webcomic.
 
     Send a message to a group.
 
-    Requires :ref:`user-auth` with "create" scope. The authenticated
+    Requires :ref:`user-auth` with "message" scope. The authenticated
     user must be a member of the group identified by `group_id`. The
     email is sent on behalf of the authenticated user. Alternatively,
     the group must have been created by the current client - in that

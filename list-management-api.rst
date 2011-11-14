@@ -42,7 +42,8 @@ group. We'll start with :http:post:`/group`:
 .. http:post:: /group
 
     Create a new mailing list. Requires :ref:`user-auth` with "create"
-    scope.
+    scope when creating on behalf of a specific user. When creating on
+    behalf of your client requires only :ref:`client-auth`.
 
     Input (as JSON POST data with *Content-Type*
     ``application/json``):
@@ -55,10 +56,17 @@ group. We'll start with :http:post:`/group`:
                    address: EMAIL_ADDRESS,
                    display_name: STRING (optional),
                    welcome_message: WELCOME_MESSAGE (optional)
-                 },
+                 } (optional),
         domain: STRING (optional),
         description: STRING (optional)
       }
+
+    `creator` is a block of information about the list's creator. If
+    `creator` is present the list is being created on behalf of a
+    specific user, so :ref:`user-auth` is required. If the list is
+    being created on behalf of your client, the `creator` field should
+    **not** be present. In that case, only :ref:`client-auth` is
+    necessary.
 
     `group_name` is the group name that will be used for the group's
     creator. If you're creating a list called "family\@fiesta.cc",
@@ -83,8 +91,8 @@ group. We'll start with :http:post:`/group`:
 
     `domain` (optional) is the domain to use for the list address. The
     default is "fiesta.cc". To use a custom domain your client must
-    have permission for that domain: contact api@corp.fiesta.cc for
-    information on using custom domains.
+    have permission for that domain: check out `Fiesta Custom
+    <https://fiesta.cc/custom>`_ for setting up custom domains.
 
     `description` (optional) is a short (maximum of 200 characters)
     description of the list. It is included in the default welcome
@@ -138,13 +146,6 @@ group. We'll start with :http:post:`/group`:
     `description` and `domain` are as described above for the method's
     input.
 
-.. note:: If your client is :ref:`trusted <trusted-clients>`, you can
-   create a group with :ref:`client <client-auth>` instead
-   of :ref:`user <user-auth>` auth. In that case, you should not include
-   the `creator` field; the only available parameters are `domain` and
-   a `description`. If a creator is supplied, a user access token is
-   required.
-
 Adding Members
 --------------
 
@@ -155,10 +156,10 @@ was returned above:
 .. http:post:: /membership/(string: group_id)
 
     Add a group membership. Requires :ref:`user-auth` with "modify"
-    scope.
-
-    The authenticated user must be a member of the group identified by
-    `group_id`.
+    scope. The authenticated user must be a member of the group
+    identified by `group_id`. Alternatively, the group must have been
+    created by the authorized client - in that case only
+    :ref:`client-auth` is required.
 
     Input (as JSON POST data with *Content-Type*
     ``application/json``):
@@ -233,12 +234,6 @@ was returned above:
 
     `group_name` is the name of the group as used by this user.
 
-.. note:: If your client is :ref:`trusted <trusted-clients>`, you can
-   use :ref:`client <client-auth>` instead of :ref:`user <user-auth>`
-   auth for this call, as long as your client was the original creator
-   of the group.
-
-
 Sending Messages
 ----------------
 
@@ -247,11 +242,13 @@ email with a link to your favorite webcomic.
 
 .. http:post:: /message/(string: group_id)
 
-    Send an email to the group. Requires :ref:`user-auth` with "create"
-    scope.
+    Send a message to a group.
 
-    The authenticated user must be a member of the group identified by
-    `group_id`. The email is sent on behalf of the authenticated user.
+    Requires :ref:`user-auth` with "create" scope. The authenticated
+    user must be a member of the group identified by `group_id`. The
+    email is sent on behalf of the authenticated user. Alternatively,
+    the group must have been created by the current client - in that
+    case, only :ref:`client-auth` is required.
 
     Input (as JSON POST data with *Content-Type*
     ``aplication/json``):
@@ -342,26 +339,28 @@ To remove a member from the list just issue a DELETE request on the membership U
 
 .. http:delete:: /membership/(string: group_id)/(string: user_id)
 
-    Remove a group membership. Requires :ref:`user-auth` with "modify"
-    scope.
+    Remove a group membership.
 
-    The authenticated user must be a member of the group identified by
-    `group_id`.
+    Requires :ref:`user-auth` with "modify" scope. The authenticated
+    user must be a member of the group identified by
+    `group_id`. Alternatively, the group must have been created by the
+    current client - in that case, only :ref:`client-auth` is
+    required.
 
     Responds with status code ``200`` if the membership either didn't
     exist or was successfully removed.
-
-    .. note:: A trusted client can remove members from a group it created.
 
 Getting Group/User Information
 ------------------------------
 
 .. http:get:: /group/(string: group_id)
 
-   Retrieve information of a group. This call requires :ref:`user-auth` of
-   a member of the group with READ scope.
+   Retrieve information about a group.
 
-   .. note:: A trusted client can make this call for groups it has created.
+   Requires :ref:`user-auth` with "read" scope. The authenticated user
+   must be a member of the group identified by
+   `group_id`. Alternatively, the group must have been created by the
+   current client - in that case, only :ref:`client-auth` is required.
 
    Returns:
 
@@ -379,8 +378,10 @@ Getting Group/User Information
 
    Retrieve specific information on a membership between a group and member.
 
-   This call requires :ref:`user-auth` with a READ scope from any user
-   within the group.
+   Requires :ref:`user-auth` with "read" scope. The authenticated user
+   must be a member of the group identified by
+   `group_id`. Alternatively, the group must have been created by the
+   current client - in that case, only :ref:`client-auth` is required.
 
    Returns:
 
@@ -393,10 +394,8 @@ Getting Group/User Information
        user_uri: URI
      }
 
-   If this is called with the :ref:`user-auth` with READ scope of the user
-   being queried, the group name for the user is also added.
-
-   Returns:
+   If the authorized user is the user has id `user_id`, the group name
+   for the user is also included:
 
    .. code-block:: js
 
@@ -408,15 +407,14 @@ Getting Group/User Information
        group_name: STRING
      }
 
-
 .. http:get:: /membership/(string: group_id)
 
    Retrieve a list of all the membership URIs for a particular group.
 
-   This call requires :ref:`user-auth` with a READ scope from user within
-   the group.
-
-   .. note:: A trusted client can make this call for groups it has created.
+   Requires :ref:`user-auth` with "read" scope. The authenticated user
+   must be a member of the group identified by
+   `group_id`. Alternatively, the group must have been created by the
+   current client - in that case, only :ref:`client-auth` is required.
 
    Returns:
 
@@ -435,8 +433,10 @@ Getting Group/User Information
 
 .. http:get:: /user/(string: user_id)
 
-   Retrieve information for a user. If the client does not have :ref:`user-auth`
-   just a list of scopes the user has authorized for the client is returned:
+   Retrieve information about a user.
+
+   The response includes a list of scopes the user with id `user_id`
+   has authorized for this client:
 
    .. code-block:: js
 
@@ -445,7 +445,8 @@ Getting Group/User Information
        scopes: SCOPES
      }
 
-   If the client has :ref:`user-auth` with a READ scope, the following is
+   If the client has :ref:`user-auth` with "read" scope, and the
+   authenticated user has id `user_id`, additional information is
    returned:
 
    .. code-block:: js
@@ -462,7 +463,7 @@ Getting Group/User Information
 
    Returns a list of all the memberships for a particular user.
 
-   This call requires :ref:`user-auth` with a READ scope.
+   Requires :ref:`user-auth` with "read" scope.
 
    Returns:
 

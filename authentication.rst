@@ -18,17 +18,6 @@ the identity of your client *and* prove that the user has given your
 client permission to act on their behalf. We'll talk about each type
 of auth in detail below.
 
-.. _trusted-clients:
-
-Most of the API methods currently in place require user auth. For
-example, to create a new list you'll need the authorization of the
-person you are creating the list on behalf of. In some cases, clients
-need to create or update lists on behalf of themselves, without
-requiring user auth. This is supported, but you'll need to ask us for
-special permission to create these "ownerless" lists. Throughout this
-documentation you'll see notes about `trusted` clients. Those notes
-are for clients who have been granted this special permission.
-
 OAuth
 -----
 

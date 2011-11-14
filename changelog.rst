@@ -1,6 +1,11 @@
 Changelog
 =========
 
+Version 0.9.2 (14 November 2011)
+--------------------------------
+
+- Removed distinction between "trusted" and "untrusted" clients.
+
 Version 0.9.1 (18 August 2011)
 ------------------------------
 

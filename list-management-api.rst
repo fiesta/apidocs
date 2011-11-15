@@ -53,7 +53,7 @@ group. We'll start with :http:post:`/group`:
       {
         creator: {
                    address: EMAIL_ADDRESS,
-                   group_name: STRING (optioal),
+                   group_name: STRING (optional),
                    display_name: STRING (optional),
                    welcome_message: WELCOME_MESSAGE (optional)
                  } (optional),
@@ -73,11 +73,11 @@ group. We'll start with :http:post:`/group`:
     (e.g. "mike@corp.fiesta.cc"). This address must be owned by the
     authenticated user.
 
-    `group_name` (optional) is the group name that will be used for 
-    the group's creator. If you're creating a list called 
-    "family\@fiesta.cc", `roup_name` should be "family". `Group_name`
-    may be omitted if and only if a `default_group_name` is specified
-    in which case the `default_group_name` will be used.
+    `group_name` (optional) is the group name that will be used for
+    the group's creator. If you're creating a list called
+    "family\@fiesta.cc", `group_name` should be "family". `group_name`
+    may be omitted if and only if a `default_group_name` is specified.
+    In that case the `default_group_name` will be used.
 
     `display_name` (optional) is the name that will be displayed for
     the group's creator throughout the Fiesta UI (e.g. "Mike
@@ -183,11 +183,11 @@ was returned above:
 
     `address` is the email address of the new member.
 
-    `group_name` (optional) is the group name that will be used for the 
-    new member. If you're creating a list called "family\@fiesta.cc",
-    `group_name` should be "family". `Group_name` may be omitted if
-    and only if a `default_group_name` exists for the list in which
-    case the `default_group_name` will be used.
+    `group_name` (optional) is the group name that will be used for
+    the new member. If you're creating a list called
+    "family\@fiesta.cc", `group_name` should be "family". `group_name`
+    may be omitted if and only if a `default_group_name` exists for
+    the list. In that case the `default_group_name` will be used.
 
     `display_name` (optional) is the name that will be displayed for
     the new member throughout the Fiesta UI. If it's included and the

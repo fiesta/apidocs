@@ -491,3 +491,56 @@ Getting Group/User Information
                        membership_uri: URI
                      }, ...]
      }
+
+Errors
+------
+
+Any API error will result in a response with a 40x HTTP status
+code. Error responses also contain a JSON body, e.g.:
+
+.. code-block:: js
+
+  {
+    status: {code: 400},
+    error: "invalid_request",
+    error_description: "Unsupported Authorization scheme"
+  }
+
+`status` will always be present, and contains a `code` field whose value will always match the HTTP status code of the response.
+
+`error` will always be present, and is a short token categorizing the error (see below for a list of possible values).
+
+`error_description` will sometimes be present, and is a long-form description of the error that occurred.
+
+List of possible `error` values:
+
+- ``"invalid_request"`` (400): The client sent a request that is
+  malformed or missing required values.
+
+- ``"invalid_scope"`` (400): The client requested authorization for a
+  scope that isn't recognized by the API.
+
+- ``"unsupported_grant_type"`` (400): The client is attempting to use
+  an unsupported OAuth grant type.
+
+- ``"invalid_token"`` (401): The API call was made using an invalid or
+  expired token.
+
+- ``"invalid_client"`` (401): The API call was made using invalid
+  client credentials.
+
+- ``"access_denied"`` (401): The client does not have sufficient
+  permissions to make the attempted request.
+
+- ``"no_such_resource"`` (404): The client is attempting to operate on
+  a resource (e.g. group, user, etc.) that does not exist.
+
+- ``"unsupported_response_type"`` (406): The client requested a
+  response type (using the Accept header) that isn't supported by the
+  API.
+
+.. note:: It's possible (though unlikely) that an attempt to use the
+   API could result in a 50x response. Any such response is
+   automatically reported so we can attempt to address the issue, but
+   following up with any helpful information about the error is
+   appreciated.

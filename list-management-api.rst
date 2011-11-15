@@ -52,11 +52,12 @@ group. We'll start with :http:post:`/group`:
 
       {
         creator: {
-                   group_name: STRING,
                    address: EMAIL_ADDRESS,
+                   group_name: STRING (optioal),
                    display_name: STRING (optional),
                    welcome_message: WELCOME_MESSAGE (optional)
                  } (optional),
+        default_group_name: STRING (optional),
         domain: STRING (optional),
         description: STRING (optional)
       }
@@ -68,13 +69,15 @@ group. We'll start with :http:post:`/group`:
     **not** be present. In that case, only :ref:`client-auth` is
     necessary.
 
-    `group_name` is the group name that will be used for the group's
-    creator. If you're creating a list called "family\@fiesta.cc",
-    `group_name` should be "family".
-
     `address` is the email address of the group's creator
     (e.g. "mike@corp.fiesta.cc"). This address must be owned by the
     authenticated user.
+
+    `group_name` (optional) is the group name that will be used for 
+    the group's creator. If you're creating a list called 
+    "family\@fiesta.cc", `roup_name` should be "family". `Group_name`
+    may be omitted if and only if a `default_group_name` is specified
+    in which case the `default_group_name` will be used.
 
     `display_name` (optional) is the name that will be displayed for
     the group's creator throughout the Fiesta UI (e.g. "Mike
@@ -88,6 +91,10 @@ group. We'll start with :http:post:`/group`:
     :ref:`Message <message>` instance, the specified message will be sent to the
     creator instead. If it's ``null`` or ``false`` no welcome message
     will be sent.
+
+    `default_group_name` (optional) is the default group name members will
+    get when added to this group unless a different one is specified when
+    being added.
 
     `domain` (optional) is the domain to use for the list address. The
     default is "fiesta.cc". To use a custom domain your client must
@@ -114,6 +121,7 @@ group. We'll start with :http:post:`/group`:
         data: {
                 group_id: GROUP_ID,
                 group_uri: URI,
+                default_group_name: STRING,
                 domain: STRING,
                 description: STRING,
                 members: URI
@@ -143,8 +151,8 @@ group. We'll start with :http:post:`/group`:
     `members` is the endpoint to use to get a list of group members or
     add another member to this group.
 
-    `description` and `domain` are as described above for the method's
-    input.
+    `description`, `domain` and `default_group_name` are as described 
+    above for the method's input.
 
 Adding Members
 --------------
@@ -167,17 +175,19 @@ was returned above:
     .. code-block:: js
 
       {
-        group_name: STRING,
         address: EMAIL_ADDRESS,
+        group_name: STRING (optional),
         display_name: STRING (optional),
         welcome_message: WELCOME_MESSAGE (optional)
       }
 
-    `group_name` is the group name that will be used for the new
-    member. If you're creating a list called "family\@fiesta.cc",
-    `group_name` should be "family".
-
     `address` is the email address of the new member.
+
+    `group_name` (optional) is the group name that will be used for the 
+    new member. If you're creating a list called "family\@fiesta.cc",
+    `group_name` should be "family". `Group_name` may be omitted if
+    and only if a `default_group_name` exists for the list in which
+    case the `default_group_name` will be used.
 
     `display_name` (optional) is the name that will be displayed for
     the new member throughout the Fiesta UI. If it's included and the
@@ -371,6 +381,7 @@ Getting Group/User Information
      {
        group_id: GROUP_ID,
        group_uri: URI,
+       default_group_name: STRING,
        domain: STRING,
        description: STRING,
        members: URI

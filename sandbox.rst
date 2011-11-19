@@ -63,6 +63,11 @@ Notes
 The sandbox does share some state among clients, so it's possible to
 see some changes in behavior based on activities of other clients.
 
+In the sandbox, clients can use any `Fiesta Custom
+<https://fiesta.cc/custom>`_ domain that they want. In production,
+clients must have permission to use a Fiesta Custom domain: the
+client's owner must be an owner of the domain.
+
 Sandbox state should be treated as temporary. We will try to only
 erase state after days of inactivity or an explicit call to
 :http:post:`/reset`, but we reserve the right to erase any sandbox

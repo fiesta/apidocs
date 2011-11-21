@@ -77,7 +77,8 @@ group. We'll start with :http:post:`/group`:
     the group's creator. If you're creating a list called
     "family\@fiesta.cc", `group_name` should be "family". `group_name`
     may be omitted if and only if a `default_group_name` is specified.
-    In that case the `default_group_name` will be used.
+    In that case the `default_group_name` will be used. See
+    :ref:`group-names` for more information.
 
     `display_name` (optional) is the name that will be displayed for
     the group's creator throughout the Fiesta UI (e.g. "Mike
@@ -92,9 +93,10 @@ group. We'll start with :http:post:`/group`:
     creator instead. If it's ``null`` or ``false`` no welcome message
     will be sent.
 
-    `default_group_name` (optional) is the default group name members will
-    get when added to this group unless a different one is specified when
-    being added.
+    `default_group_name` (optional) is the default group name members
+    will get when added to this group unless a different one is
+    specified when being added. See :ref:`group-names` for more
+    information.
 
     `domain` (optional) is the domain to use for the list address. The
     default is "fiesta.cc". To use a custom domain your client must
@@ -187,7 +189,8 @@ was returned above:
     the new member. If you're creating a list called
     "family\@fiesta.cc", `group_name` should be "family". `group_name`
     may be omitted if and only if a `default_group_name` exists for
-    the list. In that case the `default_group_name` will be used.
+    the list. In that case the `default_group_name` will be used. See
+    :ref:`group-names` for more information.
 
     `display_name` (optional) is the name that will be displayed for
     the new member throughout the Fiesta UI. If it's included and the
@@ -243,6 +246,28 @@ was returned above:
     created) user.
 
     `group_name` is the name of the group as used by this user.
+
+.. _group-names:
+
+Notes on Group Names
+--------------------
+
+Group names may only contain letters, numbers, '-', '_', and '.'. The
+maximum length of a group name is 30 characters. Names are not case
+sensitive and '-', '_', and '.' are ignored for the purposes of
+equality testing. So ``"test"``, ``"t_e_s_t"`` and ``"Te.ST"`` are
+considered equivalent.
+
+When adding someone to a list with a specific group name, the name
+they are actual added with may differ: Fiesta will automatically
+ensure that the name is unique among all of their lists. If
+mike@example.com already has a list called "family" and your client
+attempts to add them to another list using the name "family" the new
+list will automatically be renamed to "family1" for that user.
+
+The group namespace is shared across all domains. If you are using a
+custom domain the same collision response will occur with groups of
+the same name using a different domain.
 
 Sending Messages
 ----------------

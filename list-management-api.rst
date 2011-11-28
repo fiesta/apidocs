@@ -180,7 +180,8 @@ was returned above:
         address: EMAIL_ADDRESS,
         group_name: STRING (optional),
         display_name: STRING (optional),
-        welcome_message: WELCOME_MESSAGE (optional)
+        welcome_message: WELCOME_MESSAGE (optional),
+        send_invite: BOOLEAN (optional)
       }
 
     `address` is the email address of the new member.
@@ -203,6 +204,14 @@ was returned above:
     instance, the specified message will be sent to the new member
     instead. If it's ``null`` or ``false`` no welcome message will be
     sent.
+
+    If `send_invite` is ``True`` (the default is ``False``), the new
+    member will be invited to the list but not added. They'll receive
+    an email invitation with a link they can click to join the
+    list. If `send_invite` is ``True`` and a custom `welcome_message`
+    is specified, the welcome message must contain the string
+    ``"$invite_url"``, which will be replaced with the URL the user
+    can click to join the group.
 
     Returns the following JSON data in the response body:
 

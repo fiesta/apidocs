@@ -474,7 +474,10 @@ Getting Group/User Information
 
 .. http:get:: /groups_for/(string: user_id)
 
-   Returns a list of all the memberships for a particular user.
+   With the proper :ref:`user-auth` this will return a list of all the
+   memberships for a particular user. If only a :ref:`client-auth` is
+   provided, only groups the user is a member of that have been created
+   by the client will be returned.
 
    Requires :ref:`user-auth` with "read" scope.
 
@@ -491,3 +494,14 @@ Getting Group/User Information
                        membership_uri: URI
                      }, ...]
      }
+
+.. http:delete:: /groups_for/(string: user_id)
+
+   Deletes all memberships returned by passing in a :ref:`client-auth`
+   to :http:get:`/groups_for/(string: user_id)`.
+
+   Requires :ref:`client-auth` with "modify" scope. Passing in a 
+   :ref:`user-auth` is currently not supported.
+
+   Responds with a status code 200 if the memberships were 
+   successfully deleted.

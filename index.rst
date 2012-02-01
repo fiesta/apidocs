@@ -54,6 +54,9 @@ Congratulations, you just made your first Fiesta API request ☺.
 Next Steps
 ----------
 
+Developers should start by checking out the Fiesta :doc:`sandbox`,
+which allows testing and experimentation in a low-impact environment.
+
 The next step for developers is to learn about how Fiesta handles
 :doc:`authentication` for API clients.
 
@@ -77,6 +80,7 @@ contributing check out the source on `Github
 .. toctree::
    :hidden:
 
+   sandbox
    authentication
    list-management-api
    message-middleware-api
